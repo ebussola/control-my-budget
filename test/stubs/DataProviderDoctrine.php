@@ -61,6 +61,21 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider {
         }
     }
 
+    /**
+     * @param \DateTime $date_start
+     * @param \DateTime $date_end
+     *
+     * @return array
+     */
+    public function findByPeriod(\DateTime $date_start, \DateTime $date_end) {
+        $data = $this->conn->executeQuery('SELECT * FROM purchase WHERE date >= ? AND date <= ?', array(
+            $date_start->format('Y-m-d'),
+            $date_end->format('Y-m-d')
+        ))->fetchAll();
+
+        return $data;
+    }
+
     private function createTable() {
         $schema = $this->conn->getSchemaManager()->createSchema();
 

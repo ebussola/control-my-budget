@@ -33,4 +33,12 @@ interface DataProvider {
      */
     public function save(array $data);
 
+    /**
+     * @param \DateTime $date_start
+     * @param \DateTime $date_end
+     *
+     * @return array
+     */
+    public function findByPeriod(\DateTime $date_start, \DateTime $date_end);
+
 }
