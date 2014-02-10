@@ -45,7 +45,7 @@ class MailImporterService {
             $data = $this->parseData($message);
 
             foreach ($data as $row) {
-                $this->data_provider->save($row);
+                $this->data_provider->savePurchase($row);
             }
         }
     }

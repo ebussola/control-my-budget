@@ -16,7 +16,7 @@ interface DataProvider {
      *
      * @return int
      */
-    public function insert(array $data);
+    public function insertPurchase(array $data);
 
     /**
      * @param int   $id
@@ -24,14 +24,14 @@ interface DataProvider {
      *
      * @return bool
      */
-    public function update($id, array $data);
+    public function updatePurchase($id, array $data);
 
     /**
      * @param array $data
      *
      * @return int
      */
-    public function save(array $data);
+    public function savePurchase(array $data);
 
     /**
      * @param \DateTime $date_start
@@ -39,6 +39,6 @@ interface DataProvider {
      *
      * @return array
      */
-    public function findByPeriod(\DateTime $date_start, \DateTime $date_end);
+    public function findPurchasesByPeriod(\DateTime $date_start, \DateTime $date_end);
 
 }

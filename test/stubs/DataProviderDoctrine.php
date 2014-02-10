@@ -26,7 +26,7 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider {
      *
      * @return int
      */
-    public function insert(array $data) {
+    public function insertPurchase(array $data) {
         $data['id'] = self::$id_count;
         $this->conn->insert('purchase', $data);
         self::$id_count++;
@@ -40,7 +40,7 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider {
      *
      * @return bool
      */
-    public function update($id, array $data) {
+    public function updatePurchase($id, array $data) {
         return $this->conn->update('purchase', $data, array('id' => $id)) === 1;
     }
 
@@ -49,13 +49,13 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider {
      *
      * @return int
      */
-    public function save(array $data) {
+    public function savePurchase(array $data) {
         if (isset($data['id']) && $data['id'] != null) {
-            $this->update($data['id'], $data);
+            $this->updatePurchase($data['id'], $data);
 
             return $data['id'];
         } else {
-            $id = $this->insert($data);
+            $id = $this->insertPurchase($data);
 
             return $id;
         }
@@ -67,7 +67,7 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider {
      *
      * @return array
      */
-    public function findByPeriod(\DateTime $date_start, \DateTime $date_end) {
+    public function findPurchasesByPeriod(\DateTime $date_start, \DateTime $date_end) {
         $data = $this->conn->executeQuery('SELECT * FROM purchase WHERE date >= ? AND date <= ?', array(
             $date_start->format('Y-m-d'),
             $date_end->format('Y-m-d')
