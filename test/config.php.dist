@@ -1,0 +1,10 @@
+<?php
+
+return array(
+    'server_path' => 'imap.gmail.com',
+    'port' => 993,
+
+    'login' => '',
+    'password' => '',
+    'mailbox' => ''
+);
