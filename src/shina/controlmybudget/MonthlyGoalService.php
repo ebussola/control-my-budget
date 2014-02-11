@@ -34,8 +34,15 @@ class MonthlyGoalService {
         }
     }
 
-    public function getGoalByMonthAndYear($month, $year) {
+    public function getMonthlyGoalByMonthAndYear($month, $year) {
+        $data = $this->data_provider->findMonthlyGoalsByMonthAndYear($month, $year);
 
+        $monthly_goals = array();
+        foreach ($data as $row) {
+            $monthly_goals[] = $this->createMonthlyGoal($row);
+        }
+
+        return $monthly_goals;
     }
 
     private function toArray(MonthlyGoal $monthly_goal) {
@@ -61,6 +68,36 @@ class MonthlyGoalService {
                 'variation' => $event->variation,
                 'category' => $event->category
             );
+        }
+
+        return $events;
+    }
+
+    /**
+     * @param $row
+     */
+    private function createMonthlyGoal($row) {
+        $monthly_goal = new MonthlyGoal\MonthlyGoal();
+        $monthly_goal->id = $row['id'];
+        $monthly_goal->month = $row['month'];
+        $monthly_goal->year = $row['year'];
+        $monthly_goal->amount_goal = (float) $row['amount_goal'];
+        $monthly_goal->events = $this->createEvents($row['events']);
+
+        return $monthly_goal;
+    }
+
+    private function createEvents($events) {
+        foreach ($events as &$event_data) {
+            $obj = new Event();
+            $obj->id = $event_data['id'];
+            $obj->date_start = new \DateTime($event_data['date_start']);
+            $obj->date_end = new \DateTime($event_data['date_end']);
+            $obj->name = $event_data['name'];
+            $obj->variation = (float) $event_data['variation'];
+            $obj->category = $event_data['category'];
+
+            $event_data = $obj;
         }
 
         return $events;

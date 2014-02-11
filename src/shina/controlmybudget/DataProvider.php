@@ -57,4 +57,12 @@ interface DataProvider {
      */
     public function updateMonthlyGoal($id, array $data);
 
+    /**
+     * @param int $month
+     * @param int $year
+     *
+     * @return MonthlyGoal[]
+     */
+    public function findMonthlyGoalsByMonthAndYear($month, $year);
+
 }

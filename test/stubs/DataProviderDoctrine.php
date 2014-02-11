@@ -111,6 +111,31 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider {
         $this->saveEvents($events, $data['id']);
     }
 
+    /**
+     * @param int $month
+     * @param int $year
+     *
+     * @return \shina\controlmybudget\MonthlyGoal[]
+     */
+    public function findMonthlyGoalsByMonthAndYear($month, $year) {
+        $query = $this->conn->createQueryBuilder()
+            ->select('*')
+            ->from('monthly_goal', 'mg')
+            ->where('mg.month = ?')
+            ->andWhere('mg.year = ?');
+        $data = $this->conn->executeQuery($query, array(
+            $month, $year
+        ))->fetchAll();
+
+        foreach ($data as &$monthly_goal_data) {
+            $events_data = $this->conn->executeQuery('SELECT * FROM event WHERE monthly_goal_id = ?', array($monthly_goal_data['id']))
+                ->fetchAll();
+            $monthly_goal_data['events'] = $events_data;
+        }
+
+        return $data;
+    }
+
     private function createTable() {
         $schema = $this->conn->getSchemaManager()->createSchema();
 
