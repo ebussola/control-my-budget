@@ -65,4 +65,12 @@ interface DataProvider {
      */
     public function findMonthlyGoalsByMonthAndYear($month, $year);
 
+    /**
+     * @param \DateTime $date_start
+     * @param \DateTime $date_end
+     *
+     * @return float
+     */
+    public function calcAmountByPeriod(\DateTime $date_start, \DateTime $date_end);
+
 }

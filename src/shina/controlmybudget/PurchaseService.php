@@ -51,6 +51,10 @@ class PurchaseService {
         return $purchases;
     }
 
+    public function getAmountByPeriod(\DateTime $date_start, \DateTime $date_end) {
+        return (float) $this->data_provider->calcAmountByPeriod($date_start, $date_end);
+    }
+
     /**
      * @param Purchase $purchase
      *

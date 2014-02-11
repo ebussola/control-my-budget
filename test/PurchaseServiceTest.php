@@ -78,6 +78,34 @@ class PurchaseServiceTest extends PHPUnit_Framework_TestCase {
         }
     }
 
+    public function testGetAmountByPeriod() {
+        $purchase = new \shina\controlmybudget\Purchase\Purchase();
+        $purchase->date = new DateTime('2014-01-15');
+        $purchase->place = 'Zona Sul';
+        $purchase->amount = 2.1;
+        $this->purchase_service->save($purchase);
+
+        $purchase = new \shina\controlmybudget\Purchase\Purchase();
+        $purchase->date = new DateTime('2013-12-25');
+        $purchase->place = 'Natalandia';
+        $purchase->amount = 300;
+        $this->purchase_service->save($purchase);
+
+        $purchase = new \shina\controlmybudget\Purchase\Purchase();
+        $purchase->date = new DateTime('2014-01-20');
+        $purchase->place = 'Casa do carnaval';
+        $purchase->amount = 54.70;
+        $this->purchase_service->save($purchase);
+
+        $purchase = new \shina\controlmybudget\Purchase\Purchase();
+        $purchase->date = new DateTime('2014-01-21');
+        $purchase->place = 'Bigbi';
+        $purchase->amount = 11.00;
+        $this->purchase_service->save($purchase);
+
+        $this->assertEquals(67.8, $this->purchase_service->getAmountByPeriod(new DateTime('2014-01-01'), new DateTime('2014-01-31')));
+    }
+
     private function assertPurchaseData($row) {
         $this->assertNotNull($row['id']);
         $this->assertNotNull($row['date']);
