@@ -76,18 +76,84 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider {
         return $data;
     }
 
+    /**
+     * @param array $data
+     *
+     * @return int
+     * ID of the added object
+     */
+    public function insertMonthlyGoal(array $data) {
+        $events = $data['events'];
+        unset($data['events']);
+
+        $data['id'] = self::$id_count;
+        $this->conn->insert('monthly_goal', $data);
+        $monthly_goal_id = $this->conn->lastInsertId();
+        self::$id_count++;
+
+        $this->saveEvents($events, $monthly_goal_id);
+
+        return $monthly_goal_id;
+    }
+
+    /**
+     * @param int   $id
+     * @param array $data
+     *
+     * @return bool
+     */
+    public function updateMonthlyGoal($id, array $data) {
+        $events = $data['events'];
+        unset($data['events']);
+
+        $this->conn->update('monthly_goal', $data, array('id' => $data['id']));
+
+        $this->saveEvents($events, $data['id']);
+    }
+
     private function createTable() {
         $schema = $this->conn->getSchemaManager()->createSchema();
 
-        $table = $schema->createTable('purchase');
-        $table->addColumn('id', 'integer');
-        $table->addColumn('date', 'date');
-        $table->addColumn('place', 'string');
-        $table->addColumn('amount', 'float');
+        $table1 = $schema->createTable('purchase');
+        $table1->addColumn('id', 'integer');
+        $table1->addColumn('date', 'date');
+        $table1->addColumn('place', 'string');
+        $table1->addColumn('amount', 'float');
+
+        $table2 = $schema->createTable('monthly_goal');
+        $table2->addColumn('id', 'integer');
+        $table2->addColumn('month', 'integer');
+        $table2->addColumn('year', 'integer');
+        $table2->addColumn('amount_goal', 'float');
+
+        $table3 = $schema->createTable('event');
+        $table3->addColumn('id', 'integer');
+        $table3->addColumn('name', 'string');
+        $table3->addColumn('date_start', 'date');
+        $table3->addColumn('date_end', 'date');
+        $table3->addColumn('variation', 'float');
+        $table3->addColumn('category', 'string');
+        $table3->addColumn('monthly_goal_id', 'integer');
 
         $sqls = $schema->toSql($this->conn->getDatabasePlatform());
         foreach ($sqls as $sql) {
             $this->conn->executeQuery($sql);
+        }
+    }
+
+    /**
+     * @param $events
+     * @param $monthly_goal_id
+     */
+    private function saveEvents($events, $monthly_goal_id) {
+        foreach ($events as $event_data) {
+            $event_data['monthly_goal_id'] = $monthly_goal_id;
+            if ($event_data['id'] == null) {
+                $event_data['id'] = self::$id_count*rand(1, 500);
+                $this->conn->insert('event', $event_data);
+            } else {
+                $this->conn->update('event', $event_data, array('id' => $event_data['id']));
+            }
         }
     }
 

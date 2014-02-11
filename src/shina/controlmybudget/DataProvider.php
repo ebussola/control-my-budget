@@ -41,4 +41,20 @@ interface DataProvider {
      */
     public function findPurchasesByPeriod(\DateTime $date_start, \DateTime $date_end);
 
+    /**
+     * @param array $data
+     *
+     * @return int
+     * ID of the added object
+     */
+    public function insertMonthlyGoal(array $data);
+
+    /**
+     * @param int   $id
+     * @param array $data
+     *
+     * @return bool
+     */
+    public function updateMonthlyGoal($id, array $data);
+
 }

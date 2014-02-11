@@ -27,10 +27,10 @@ class PurchaseService {
         $data = $this->toArray($purchase);
 
         if ($purchase->id == null) {
-            $id = $this->data_provider->insert($data);
+            $id = $this->data_provider->insertPurchase($data);
             $purchase->id = $id;
         } else {
-            $this->data_provider->update($purchase->id, $data);
+            $this->data_provider->updatePurchase($purchase->id, $data);
         }
     }
 
@@ -41,7 +41,7 @@ class PurchaseService {
      * @return Purchase[]
      */
     public function getPurchasesByPeriod(\DateTime $date_start, \DateTime $date_end) {
-        $data = $this->data_provider->findByPeriod($date_start, $date_end);
+        $data = $this->data_provider->findPurchasesByPeriod($date_start, $date_end);
 
         $purchases = array();
         foreach ($data as $row) {
