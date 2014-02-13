@@ -34,6 +34,28 @@ class MonthlyGoalService {
         }
     }
 
+    /**
+     * @param int $monthly_goal_id
+     *
+     * @return MonthlyGoal
+     */
+    public function getMonthlyGoalById($monthly_goal_id) {
+        $data = $this->data_provider->findMonthlyGoalByIds([$monthly_goal_id]);
+
+        $monthly_goals = array();
+        foreach ($data as $row) {
+            $monthly_goals[] = $this->createMonthlyGoal($row);
+        }
+
+        return reset($monthly_goals);
+    }
+
+    /**
+     * @param int $month
+     * @param int $year
+     *
+     * @return MonthlyGoal[]
+     */
     public function getMonthlyGoalByMonthAndYear($month, $year) {
         $data = $this->data_provider->findMonthlyGoalsByMonthAndYear($month, $year);
 

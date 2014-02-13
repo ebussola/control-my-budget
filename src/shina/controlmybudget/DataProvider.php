@@ -73,4 +73,11 @@ interface DataProvider {
      */
     public function calcAmountByPeriod(\DateTime $date_start, \DateTime $date_end);
 
+    /**
+     * @param int[] $monthly_goal_ids
+     *
+     * @return MonthlyGoal[]
+     */
+    public function findMonthlyGoalByIds($monthly_goal_ids);
+
 }

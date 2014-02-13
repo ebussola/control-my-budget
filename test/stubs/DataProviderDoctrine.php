@@ -13,7 +13,7 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider {
      */
     private $conn;
 
-    static public $id_count = 1;
+    private $id_count = 1;
 
     public function __construct(\Doctrine\DBAL\Connection $conn) {
         $this->conn = $conn;
@@ -27,9 +27,9 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider {
      * @return int
      */
     public function insertPurchase(array $data) {
-        $data['id'] = self::$id_count;
+        $data['id'] = $this->id_count;
         $this->conn->insert('purchase', $data);
-        self::$id_count++;
+        $this->id_count++;
 
         return $this->conn->lastInsertId();
     }
@@ -86,10 +86,10 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider {
         $events = $data['events'];
         unset($data['events']);
 
-        $data['id'] = self::$id_count;
+        $data['id'] = $this->id_count;
         $this->conn->insert('monthly_goal', $data);
         $monthly_goal_id = $this->conn->lastInsertId();
-        self::$id_count++;
+        $this->id_count++;
 
         $this->saveEvents($events, $monthly_goal_id);
 
@@ -152,6 +152,31 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider {
         return $amount;
     }
 
+    /**
+     * @param int[] $monthly_goal_ids
+     *
+     * @return \shina\controlmybudget\MonthlyGoal
+     */
+    public function findMonthlyGoalByIds($monthly_goal_ids) {
+        $query = $this->conn->createQueryBuilder()
+            ->select('*')
+            ->from('monthly_goal', 'mg')
+            ->where('mg.id IN (?)');
+        $data = $this->conn->executeQuery($query, array(
+            $monthly_goal_ids
+        ), array(
+            \Doctrine\DBAL\Connection::PARAM_INT_ARRAY
+        ))->fetchAll();
+
+        foreach ($data as &$monthly_goal_data) {
+            $events_data = $this->conn->executeQuery('SELECT * FROM event WHERE monthly_goal_id = ?', array($monthly_goal_data['id']))
+                ->fetchAll();
+            $monthly_goal_data['events'] = $events_data;
+        }
+
+        return $data;
+    }
+
     private function createTable() {
         $schema = $this->conn->getSchemaManager()->createSchema();
 
@@ -190,7 +215,7 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider {
         foreach ($events as $event_data) {
             $event_data['monthly_goal_id'] = $monthly_goal_id;
             if ($event_data['id'] == null) {
-                $event_data['id'] = self::$id_count*rand(1, 500);
+                $event_data['id'] = $this->id_count*rand(1, 500);
                 $this->conn->insert('event', $event_data);
             } else {
                 $this->conn->update('event', $event_data, array('id' => $event_data['id']));

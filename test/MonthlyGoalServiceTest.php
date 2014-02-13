@@ -60,6 +60,17 @@ class MonthlyGoalServiceTest extends PHPUnit_Framework_TestCase {
         }
     }
 
+    public function testGetMonthlyGoalById() {
+        $monthly_goal1 = $this->createExampleGoal();
+        $this->monthly_goal_service->save($monthly_goal1);
+        $monthly_goal2 = $this->createExampleGoal2();
+        $this->monthly_goal_service->save($monthly_goal2);
+
+        $monthly_goal = $this->monthly_goal_service->getMonthlyGoalById(2);
+        $this->assertEquals($monthly_goal->id, $monthly_goal2->id);
+        $this->assertNotEquals($monthly_goal->id, $monthly_goal1->id);
+    }
+
     private function assertMonthlyGoalData($row) {
         $this->assertNotNull($row['id']);
         $this->assertNotNull($row['month']);
