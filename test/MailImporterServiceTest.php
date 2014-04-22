@@ -33,8 +33,13 @@ class MailImporterServiceTest extends PHPUnit_Framework_TestCase {
         ));
 
         $data_provider = new DataProviderDoctrine($this->conn);
+        $purchase_service = new \shina\controlmybudget\PurchaseService($data_provider);
 
-        $this->mail_importer_service = new \shina\controlmybudget\MailImporterService($imap, $data_provider);
+        $this->mail_importer_service = new \shina\controlmybudget\MailImporterService($imap, $purchase_service);
+    }
+
+    public function tearDown() {
+        $this->conn->close();
     }
 
     public function testImport() {
@@ -44,6 +49,17 @@ class MailImporterServiceTest extends PHPUnit_Framework_TestCase {
         foreach ($data as $row) {
             $this->assertPurchaseData($row);
         }
+    }
+
+    public function testImportDuplicated() {
+        $this->mail_importer_service->import(1);
+        $data = $this->conn->executeQuery('SELECT * FROM purchase')->fetchAll();
+        $data_count = count($data);
+
+        $this->mail_importer_service->import(1);
+        $data = $this->conn->executeQuery('SELECT * FROM purchase')->fetchAll();
+
+        $this->assertCount($data_count, $data);
     }
 
     private function assertPurchaseData($row) {

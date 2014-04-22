@@ -42,6 +42,13 @@ interface DataProvider {
     public function findPurchasesByPeriod(\DateTime $date_start, \DateTime $date_end);
 
     /**
+     * @param string $hash
+     *
+     * @return array
+     */
+    public function findPurchaseByHash($hash);
+
+    /**
      * @param array $data
      *
      * @return int

@@ -77,6 +77,20 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider {
     }
 
     /**
+     * @param string $hash
+     *
+     * @return array
+     */
+    public function findPurchaseByHash($hash)
+    {
+        $data = $this->conn->executeQuery('SELECT * FROM purchase WHERE hash=?', array(
+            $hash
+        ))->fetch();
+
+        return $data;
+    }
+
+    /**
      * @param array $data
      *
      * @return int
@@ -185,6 +199,7 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider {
         $table1->addColumn('date', 'date');
         $table1->addColumn('place', 'string');
         $table1->addColumn('amount', 'float');
+        $table1->addColumn('hash', 'string');
 
         $table2 = $schema->createTable('monthly_goal');
         $table2->addColumn('id', 'integer');

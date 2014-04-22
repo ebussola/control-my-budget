@@ -26,11 +26,19 @@ class PurchaseService {
     public function save(Purchase $purchase) {
         $data = $this->toArray($purchase);
 
-        if ($purchase->id == null) {
-            $id = $this->data_provider->insertPurchase($data);
-            $purchase->id = $id;
+        $hash = md5(join('.', $data));
+        if (!$this->data_provider->findPurchaseByHash($hash)) {
+
+            $data['hash'] = $hash;
+            if ($purchase->id == null) {
+                $id = $this->data_provider->insertPurchase($data);
+                $purchase->id = $id;
+            } else {
+                $this->data_provider->updatePurchase($purchase->id, $data);
+            }
+
         } else {
-            $this->data_provider->updatePurchase($purchase->id, $data);
+            throw new \Exception('Purchase already registered');
         }
     }
 

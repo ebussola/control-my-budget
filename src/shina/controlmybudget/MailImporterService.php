@@ -19,13 +19,13 @@ class MailImporterService {
     private $imap;
 
     /**
-     * @var DataProvider
+     * @var PurchaseService
      */
-    private $data_provider;
+    private $purchase_service;
 
-    public function __construct(\Fetch\Server $imap, DataProvider $data_provider) {
+    public function __construct(\Fetch\Server $imap, PurchaseService $purchase_service) {
         $this->imap = $imap;
-        $this->data_provider = $data_provider;
+        $this->purchase_service = $purchase_service;
     }
 
     /**
@@ -44,8 +44,13 @@ class MailImporterService {
         foreach ($messages as $message) {
             $data = $this->parseData($message);
 
-            foreach ($data as $row) {
-                $this->data_provider->savePurchase($row);
+            foreach ($data as $purchase) {
+
+                try {
+                    $this->purchase_service->save($purchase);
+                } catch (\Exception $e) {
+                    continue;
+                }
             }
         }
     }
@@ -60,7 +65,7 @@ class MailImporterService {
     /**
      * @param Message $message
      *
-     * @return array
+     * @return Purchase[]
      */
     private function parseData(Message $message) {
         $dom = new \DOMDocument();
@@ -72,16 +77,16 @@ class MailImporterService {
             if (strstr($nodes->item($i)->nodeValue, 'R$')) {
                 $date = $nodes->item($i)->childNodes->item(0)->nodeValue;
                 $date = new \DateTime(trim($date));
-                $date = $date->format('Y-m-d');
 
                 $place = $nodes->item($i)->childNodes->item(1)->nodeValue;
                 $amount = $nodes->item($i)->childNodes->item(2)->nodeValue;
 
-                $data[] = array(
-                    'date' => $date,
-                    'place' => trim($place),
-                    'amount' => (float) str_replace('R$', '', str_replace(',', '.', str_replace('.', '', trim($amount))))
-                );
+                $purchase = new \shina\controlmybudget\Purchase\Purchase();
+                $purchase->date = $date;
+                $purchase->place = trim($place);
+                $purchase->amount = (float) str_replace('R$', '', str_replace(',', '.', str_replace('.', '', trim($amount))));
+
+                $data[] = $purchase;
             } else {
                 break;
             }
