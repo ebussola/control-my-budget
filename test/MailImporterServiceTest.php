@@ -49,6 +49,10 @@ class MailImporterServiceTest extends PHPUnit_Framework_TestCase {
     private function assertPurchaseData($row) {
         $this->assertNotNull($row['id']);
         $this->assertNotNull($row['date']);
+
+        $date_portion = explode('-', $row['date']);
+        $this->assertTrue(checkdate($date_portion[1], $date_portion[2], $date_portion[0]));
+
         $this->assertNotNull($row['place']);
         $this->assertNotNull($row['amount']);
     }

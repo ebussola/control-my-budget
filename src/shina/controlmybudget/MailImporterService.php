@@ -71,11 +71,14 @@ class MailImporterService {
         for ($i=5 ; $i<=$nodes->length ; $i++) {
             if (strstr($nodes->item($i)->nodeValue, 'R$')) {
                 $date = $nodes->item($i)->childNodes->item(0)->nodeValue;
+                $date = new \DateTime(trim($date));
+                $date = $date->format('Y-m-d');
+
                 $place = $nodes->item($i)->childNodes->item(1)->nodeValue;
                 $amount = $nodes->item($i)->childNodes->item(2)->nodeValue;
 
                 $data[] = array(
-                    'date' => trim($date),
+                    'date' => $date,
                     'place' => trim($place),
                     'amount' => (float) str_replace('R$', '', str_replace(',', '.', str_replace('.', '', trim($amount))))
                 );
