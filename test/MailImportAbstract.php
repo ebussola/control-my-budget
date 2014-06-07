@@ -6,12 +6,12 @@
  * Time: 16:38
  */
 
-class MailImporterServiceTest extends PHPUnit_Framework_TestCase {
+abstract class MailImportAbstract extends PHPUnit_Framework_TestCase {
 
     /**
-     * @var \shina\controlmybudget\ImportHandler\MailItauCardImport
+     * @var \shina\controlmybudget\Importer
      */
-    private $mail_importer_service;
+    private $mail_importer;
 
     /**
      * @var \Doctrine\DBAL\Connection
@@ -35,7 +35,7 @@ class MailImporterServiceTest extends PHPUnit_Framework_TestCase {
         $data_provider = new DataProviderDoctrine($this->conn);
         $purchase_service = new \shina\controlmybudget\PurchaseService($data_provider);
 
-        $this->mail_importer_service = new \shina\controlmybudget\ImportHandler\MailItauCardImport($imap, $purchase_service);
+        $this->mail_importer = $this->makeImporter($imap, $purchase_service);
     }
 
     public function tearDown() {
@@ -43,7 +43,7 @@ class MailImporterServiceTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testImport() {
-        $this->mail_importer_service->import(5);
+        $this->mail_importer->import(5);
         $data = $this->conn->executeQuery('SELECT * FROM purchase')->fetchAll();
 
         foreach ($data as $row) {
@@ -52,11 +52,11 @@ class MailImporterServiceTest extends PHPUnit_Framework_TestCase {
     }
 
     public function testImportDuplicated() {
-        $this->mail_importer_service->import(1);
+        $this->mail_importer->import(1);
         $data = $this->conn->executeQuery('SELECT * FROM purchase')->fetchAll();
         $data_count = count($data);
 
-        $this->mail_importer_service->import(1);
+        $this->mail_importer->import(1);
         $data = $this->conn->executeQuery('SELECT * FROM purchase')->fetchAll();
 
         $this->assertCount($data_count, $data);
@@ -72,5 +72,7 @@ class MailImporterServiceTest extends PHPUnit_Framework_TestCase {
         $this->assertNotNull($row['place']);
         $this->assertNotNull($row['amount']);
     }
+
+    abstract protected function makeImporter($imap, $purchase_service);
 
 }

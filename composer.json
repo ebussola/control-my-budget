@@ -14,7 +14,8 @@
 
     "require": {
         "tedivm/fetch": "~0.5",
-        "ebussola/goalr": "~1.0"
+        "ebussola/goalr": "~1.0",
+        "ebussola/common-datatype": "~2.0"
     },
     "require-dev": {
         "phpunit/phpunit": "3.7.30",

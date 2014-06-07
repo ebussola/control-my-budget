@@ -7,4 +7,5 @@
  */
 
 require __DIR__ . '/../vendor/autoload.php';
+require 'MailImportAbstract.php';
 require 'stubs/DataProviderDoctrine.php';

@@ -35,7 +35,7 @@ abstract class MailImportAbstract {
      */
     public function import($limit=3) {
         // making the work of Fetch package
-        $messages = imap_sort($this->imap->getImapStream(), SORTARRIVAL, 1, SE_UID, 'FROM "itaucard@itau-unibanco.com.br" SUBJECT "realizadas"');
+        $messages = imap_sort($this->imap->getImapStream(), SORTARRIVAL, 1, SE_UID, $this->getImapSearch());
         if ($limit != null) {
             $messages = array_slice($messages, 0, $limit);
         }
@@ -70,5 +70,10 @@ abstract class MailImportAbstract {
      * @return Purchase[]
      */
     abstract protected function parseData(Message $message);
+
+    /**
+     * @return string
+     */
+    abstract protected function getImapSearch();
 
 }

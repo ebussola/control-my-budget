@@ -48,4 +48,12 @@ class MailItauCardImport extends MailImportAbstract implements Importer {
         return $data;
     }
 
+    /**
+     * @return string
+     */
+    protected function getImapSearch()
+    {
+        return 'FROM "itaucard@itau-unibanco.com.br" SUBJECT "realizadas"';
+    }
+
 }
