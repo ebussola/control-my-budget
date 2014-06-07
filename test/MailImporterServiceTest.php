@@ -9,7 +9,7 @@
 class MailImporterServiceTest extends PHPUnit_Framework_TestCase {
 
     /**
-     * @var \shina\controlmybudget\MailImporterService
+     * @var \shina\controlmybudget\ImportHandler\MailImport
      */
     private $mail_importer_service;
 
@@ -35,7 +35,7 @@ class MailImporterServiceTest extends PHPUnit_Framework_TestCase {
         $data_provider = new DataProviderDoctrine($this->conn);
         $purchase_service = new \shina\controlmybudget\PurchaseService($data_provider);
 
-        $this->mail_importer_service = new \shina\controlmybudget\MailImporterService($imap, $purchase_service);
+        $this->mail_importer_service = new \shina\controlmybudget\ImportHandler\MailImport($imap, $purchase_service);
     }
 
     public function tearDown() {

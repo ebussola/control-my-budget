@@ -6,12 +6,15 @@
  * Time: 16:39
  */
 
-namespace shina\controlmybudget;
+namespace shina\controlmybudget\ImportHandler;
 
 
 use Fetch\Message;
+use shina\controlmybudget\Importer;
+use shina\controlmybudget\Purchase;
+use shina\controlmybudget\PurchaseService;
 
-class MailImporterService {
+class MailImport implements Importer {
 
     /**
      * @var \Fetch\Server
