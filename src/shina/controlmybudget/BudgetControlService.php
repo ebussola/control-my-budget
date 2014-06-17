@@ -31,10 +31,12 @@ class BudgetControlService {
 
     /**
      * @param MonthlyGoal $monthly_goal
+     * @param float|null $manual_spent
+     * Use $manual_spent to add a simulation spent to preview a daily budget with this spent.
      *
      * @return float
      */
-    public function getDailyBudget(MonthlyGoal $monthly_goal) {
+    public function getDailyBudget(MonthlyGoal $monthly_goal, $manual_spent=null) {
         $date_start = new \DateTime();
         $date_start->setDate($monthly_goal->year, $monthly_goal->month, 1);
 
@@ -47,6 +49,9 @@ class BudgetControlService {
         $goal->total_budget = $monthly_goal->amount_goal;
 
         $spent = $this->purchase_service->getAmountByPeriod($date_start, new Date('yesterday'));
+        if ($manual_spent !== null) {
+            $spent += $manual_spent;
+        }
         $spent_today = $this->purchase_service->getAmountByPeriod(new Date(), new Date());
         $daily_budget = $this->goalr->getDailyBudget($goal, $spent, $monthly_goal->events);
 
