@@ -103,16 +103,16 @@
         },
         {
             "name": "ebussola/common-datatype",
-            "version": "2.0.3",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ebussola/common-datatype.git",
-                "reference": "d58304c06d02db469755a62b2757babf49cebbdb"
+                "reference": "cc840688b09e0b7aae07383b2c2089a3b606c3c6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ebussola/common-datatype/zipball/d58304c06d02db469755a62b2757babf49cebbdb",
-                "reference": "d58304c06d02db469755a62b2757babf49cebbdb",
+                "url": "https://api.github.com/repos/ebussola/common-datatype/zipball/cc840688b09e0b7aae07383b2c2089a3b606c3c6",
+                "reference": "cc840688b09e0b7aae07383b2c2089a3b606c3c6",
                 "shasum": ""
             },
             "require": {
@@ -140,20 +140,20 @@
                     "email": "leonardo@ebussola.com"
                 }
             ],
-            "time": "2014-05-19 16:33:29"
+            "time": "2014-06-11 19:34:01"
         },
         {
             "name": "ebussola/goalr",
-            "version": "1.0.0",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ebussola/goalr.git",
-                "reference": "147a5069fb4e59408430654a20c6938e819e921c"
+                "reference": "66310550e8ba247a708d037658cfed801ce29f47"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ebussola/goalr/zipball/147a5069fb4e59408430654a20c6938e819e921c",
-                "reference": "147a5069fb4e59408430654a20c6938e819e921c",
+                "url": "https://api.github.com/repos/ebussola/goalr/zipball/66310550e8ba247a708d037658cfed801ce29f47",
+                "reference": "66310550e8ba247a708d037658cfed801ce29f47",
                 "shasum": ""
             },
             "require-dev": {
@@ -173,7 +173,7 @@
                 }
             ],
             "description": "Daily Budget based on a total budget, a period and events",
-            "time": "2014-01-12 14:47:40"
+            "time": "2014-06-07 22:44:47"
         },
         {
             "name": "tedivm/fetch",

@@ -88,5 +88,49 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
         echo $this->budget_control_service->getDailyBudget($monthly_goal);
     }
 
+    public function testDecreaseTodaysPurchases()
+    {
+        $purchase = new \shina\controlmybudget\Purchase\Purchase();
+        $purchase->date = new \ebussola\common\datatype\datetime\Date('2014-06-01');
+        $purchase->place = 'foo';
+        $purchase->amount = 700;
+        $this->purchase_service->save($purchase);
+
+        $purchase = new \shina\controlmybudget\Purchase\Purchase();
+        $purchase->date = new \ebussola\common\datatype\datetime\Date('2014-06-15');
+        $purchase->place = 'foo';
+        $purchase->amount = 50;
+        $this->purchase_service->save($purchase);
+
+        $purchase = new \shina\controlmybudget\Purchase\Purchase();
+        $purchase->date = new \ebussola\common\datatype\datetime\Date('2014-06-16');
+        $purchase->place = 'foo';
+        $purchase->amount = 25;
+        $this->purchase_service->save($purchase);
+
+        $purchase = new \shina\controlmybudget\Purchase\Purchase();
+        $purchase->date = new \ebussola\common\datatype\datetime\Date('2014-06-16');
+        $purchase->place = 'foobar';
+        $purchase->amount = 25;
+        $this->purchase_service->save($purchase);
+
+        $purchase = new \shina\controlmybudget\Purchase\Purchase();
+        $purchase->date = new \ebussola\common\datatype\datetime\Date('2014-06-17');
+        $purchase->place = 'bar';
+        $purchase->amount = 30;
+        $this->purchase_service->save($purchase);
+
+        $monthly_goal = new \shina\controlmybudget\MonthlyGoal\MonthlyGoal();
+        $monthly_goal->month = 6;
+        $monthly_goal->year = 2014;
+        $monthly_goal->amount_goal = 1500;
+        $monthly_goal->events = [];
+
+        $goalr = new Goalr(new \ebussola\common\datatype\datetime\Date('2014-06-17'));
+        $budget_control_service = new \shina\controlmybudget\BudgetControlService($this->purchase_service, $goalr);
+
+        $this->assertEquals(20, $budget_control_service->getDailyBudget($monthly_goal));
+    }
+
 }
  

@@ -8,6 +8,7 @@
 
 namespace shina\controlmybudget;
 
+use ebussola\common\datatype\datetime\Date;
 use ebussola\goalr\goal\Goal;
 use ebussola\goalr\Goalr;
 
@@ -45,9 +46,11 @@ class BudgetControlService {
         $goal->date_end = $date_end;
         $goal->total_budget = $monthly_goal->amount_goal;
 
-        $amount = $this->purchase_service->getAmountByPeriod($date_start, $date_end);
+        $spent = $this->purchase_service->getAmountByPeriod($date_start, new Date('yesterday'));
+        $spent_today = $this->purchase_service->getAmountByPeriod(new Date(), new Date());
+        $daily_budget = $this->goalr->getDailyBudget($goal, $spent, $monthly_goal->events);
 
-        return $this->goalr->getDailyBudget($goal, $amount, $monthly_goal->events);
+        return $daily_budget - $spent_today;
     }
 
 }
