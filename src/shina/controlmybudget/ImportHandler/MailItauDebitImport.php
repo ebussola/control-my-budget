@@ -47,7 +47,7 @@ class MailItauDebitImport extends MailImportAbstract implements Importer {
      */
     protected function getImapSearch()
     {
-        return 'FROM "comunicacaodigital@itau-unibanco.com.br" SUBJECT "'.utf8_decode('Compra com cartão débito aprovada').'"';
+        return 'FROM "comunicacaodigital@itau-unibanco.com.br" SUBJECT "Compra com cartão débito aprovada"';
     }
 
 }
