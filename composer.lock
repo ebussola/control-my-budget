@@ -103,16 +103,16 @@
         },
         {
             "name": "ebussola/common-datatype",
-            "version": "2.1.0",
+            "version": "2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ebussola/common-datatype.git",
-                "reference": "cc840688b09e0b7aae07383b2c2089a3b606c3c6"
+                "reference": "f5e3ba6a55806256f296826e9daec3ea23f245b3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ebussola/common-datatype/zipball/cc840688b09e0b7aae07383b2c2089a3b606c3c6",
-                "reference": "cc840688b09e0b7aae07383b2c2089a3b606c3c6",
+                "url": "https://api.github.com/repos/ebussola/common-datatype/zipball/f5e3ba6a55806256f296826e9daec3ea23f245b3",
+                "reference": "f5e3ba6a55806256f296826e9daec3ea23f245b3",
                 "shasum": ""
             },
             "require": {
@@ -140,21 +140,24 @@
                     "email": "leonardo@ebussola.com"
                 }
             ],
-            "time": "2014-06-11 19:34:01"
+            "time": "2014-06-27 12:35:27"
         },
         {
             "name": "ebussola/goalr",
-            "version": "1.0.1",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ebussola/goalr.git",
-                "reference": "66310550e8ba247a708d037658cfed801ce29f47"
+                "reference": "4719e46f8637a63cf92026ccc47d2279a9b1d335"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ebussola/goalr/zipball/66310550e8ba247a708d037658cfed801ce29f47",
-                "reference": "66310550e8ba247a708d037658cfed801ce29f47",
+                "url": "https://api.github.com/repos/ebussola/goalr/zipball/4719e46f8637a63cf92026ccc47d2279a9b1d335",
+                "reference": "4719e46f8637a63cf92026ccc47d2279a9b1d335",
                 "shasum": ""
+            },
+            "require": {
+                "ebussola/common-datatype": "~2.1"
             },
             "require-dev": {
                 "phpunit/phpunit": "3.7.28"
@@ -173,7 +176,7 @@
                 }
             ],
             "description": "Daily Budget based on a total budget, a period and events",
-            "time": "2014-06-07 22:44:47"
+            "time": "2014-06-27 13:45:48"
         },
         {
             "name": "tedivm/fetch",
