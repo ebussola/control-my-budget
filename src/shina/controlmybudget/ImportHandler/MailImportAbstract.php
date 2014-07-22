@@ -13,7 +13,8 @@ use Fetch\Message;
 use shina\controlmybudget\Purchase;
 use shina\controlmybudget\PurchaseService;
 
-abstract class MailImportAbstract {
+abstract class MailImportAbstract
+{
 
     /**
      * @var \Fetch\Server
@@ -25,7 +26,8 @@ abstract class MailImportAbstract {
      */
     private $purchase_service;
 
-    public function __construct(\Fetch\Server $imap, PurchaseService $purchase_service) {
+    public function __construct(\Fetch\Server $imap, PurchaseService $purchase_service)
+    {
         $this->imap = $imap;
         $this->purchase_service = $purchase_service;
     }
@@ -33,7 +35,8 @@ abstract class MailImportAbstract {
     /**
      * @param int|null $limit
      */
-    public function import($limit=3) {
+    public function import($limit = 3)
+    {
         // making the work of Fetch package
         $messages = imap_sort($this->imap->getImapStream(), SORTARRIVAL, 1, SE_UID, $this->getImapSearch());
         if ($limit != null) {
@@ -60,7 +63,8 @@ abstract class MailImportAbstract {
     /**
      * Make the first import
      */
-    public function firstImport() {
+    public function firstImport()
+    {
         $this->import(null);
     }
 

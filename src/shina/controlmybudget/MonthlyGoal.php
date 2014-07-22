@@ -20,6 +20,7 @@ use ebussola\goalr\Event;
  * @property float   $amount_goal
  * @property Event[] $events
  */
-interface MonthlyGoal {
+interface MonthlyGoal
+{
 
 }

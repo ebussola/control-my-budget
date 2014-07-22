@@ -15,14 +15,16 @@ use Fetch\Message;
 use shina\controlmybudget\Importer;
 use shina\controlmybudget\Purchase;
 
-class MailItauPaymentImport extends MailImportAbstract implements Importer {
+class MailItauPaymentImport extends MailImportAbstract implements Importer
+{
 
     /**
      * @param Message $message
      *
      * @return Purchase[]
      */
-    protected function parseData(Message $message) {
+    protected function parseData(Message $message)
+    {
         $dom = new \DOMDocument();
         $dom->loadHTML($message->getMessageBody(true));
         $nodes = $dom->getElementsByTagName('p');

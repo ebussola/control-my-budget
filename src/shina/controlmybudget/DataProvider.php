@@ -9,7 +9,8 @@
 namespace shina\controlmybudget;
 
 
-interface DataProvider {
+interface DataProvider
+{
 
     /**
      * @param array $data
@@ -19,7 +20,7 @@ interface DataProvider {
     public function insertPurchase(array $data);
 
     /**
-     * @param int   $id
+     * @param int $id
      * @param array $data
      *
      * @return bool
@@ -63,7 +64,7 @@ interface DataProvider {
     public function insertMonthlyGoal(array $data);
 
     /**
-     * @param int   $id
+     * @param int $id
      * @param array $data
      *
      * @return bool
@@ -81,7 +82,7 @@ interface DataProvider {
     /**
      * @return array
      */
-    public function findAllMonthlyGoals($page=1, $page_size=null);
+    public function findAllMonthlyGoals($page = 1, $page_size = null);
 
     /**
      * @param \DateTime $date_start

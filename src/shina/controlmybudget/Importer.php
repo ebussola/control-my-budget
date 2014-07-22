@@ -9,12 +9,13 @@
 namespace shina\controlmybudget;
 
 
-interface Importer {
+interface Importer
+{
 
     /**
      * @param int|null $limit
      */
-    public function import($limit=3);
+    public function import($limit = 3);
 
     /**
      * Make the first import

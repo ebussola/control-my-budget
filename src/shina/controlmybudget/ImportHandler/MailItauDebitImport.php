@@ -15,14 +15,16 @@ use Fetch\Message;
 use shina\controlmybudget\Importer;
 use shina\controlmybudget\Purchase;
 
-class MailItauDebitImport extends MailImportAbstract implements Importer {
+class MailItauDebitImport extends MailImportAbstract implements Importer
+{
 
     /**
      * @param Message $message
      *
      * @return Purchase[]
      */
-    protected function parseData(Message $message) {
+    protected function parseData(Message $message)
+    {
         $dom = new \DOMDocument();
         $dom->loadHTML($message->getMessageBody(true));
         $nodes = $dom->getElementsByTagName('p');
@@ -30,7 +32,11 @@ class MailItauDebitImport extends MailImportAbstract implements Importer {
         $purchase = new Purchase\Purchase();
 
         $matches = [];
-        preg_match('/((?:(?:[0-2]?\\d{1})|(?:[3][01]{1}))[-:\\/.](?:[0]?[1-9]|[1][012])[-:\\/.](?:(?:[1]{1}\\d{1}\\d{1}\\d{1})|(?:[2]{1}\\d{3})))(?![\\d])/', $nodes->item(2)->nodeValue, $matches);
+        preg_match(
+            '/((?:(?:[0-2]?\\d{1})|(?:[3][01]{1}))[-:\\/.](?:[0]?[1-9]|[1][012])[-:\\/.](?:(?:[1]{1}\\d{1}\\d{1}\\d{1})|(?:[2]{1}\\d{3})))(?![\\d])/',
+            $nodes->item(2)->nodeValue,
+            $matches
+        );
         $purchase->date = new Date(join('-', array_reverse(explode('/', $matches[1]))));
 
         preg_match('/local: (.*?),/', str_replace('.', ',', $nodes->item(2)->nodeValue), $matches);

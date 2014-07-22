@@ -13,20 +13,22 @@ use Fetch\Message;
 use shina\controlmybudget\Importer;
 use shina\controlmybudget\Purchase;
 
-class MailItauCardImport extends MailImportAbstract implements Importer {
+class MailItauCardImport extends MailImportAbstract implements Importer
+{
 
     /**
      * @param Message $message
      *
      * @return Purchase[]
      */
-    protected function parseData(Message $message) {
+    protected function parseData(Message $message)
+    {
         $dom = new \DOMDocument();
         $dom->loadHTML($message->getMessageBody(true));
         $nodes = $dom->getElementsByTagName('tr');
 
         $data = array();
-        for ($i=5 ; $i<=$nodes->length ; $i++) {
+        for ($i = 5; $i <= $nodes->length; $i++) {
             if (strstr($nodes->item($i)->nodeValue, 'R$')) {
                 $date = $nodes->item($i)->childNodes->item(0)->nodeValue;
                 $date = new \DateTime(trim($date));
@@ -37,7 +39,11 @@ class MailItauCardImport extends MailImportAbstract implements Importer {
                 $purchase = new \shina\controlmybudget\Purchase\Purchase();
                 $purchase->date = $date;
                 $purchase->place = trim($place);
-                $purchase->amount = (float) str_replace('R$', '', str_replace(',', '.', str_replace('.', '', trim($amount))));
+                $purchase->amount = (float)str_replace(
+                    'R$',
+                    '',
+                    str_replace(',', '.', str_replace('.', '', trim($amount)))
+                );
 
                 $data[] = $purchase;
             } else {

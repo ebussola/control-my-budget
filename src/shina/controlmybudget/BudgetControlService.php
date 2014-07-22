@@ -11,7 +11,8 @@ namespace shina\controlmybudget;
 use ebussola\goalr\goal\Goal;
 use ebussola\goalr\Goalr;
 
-class BudgetControlService {
+class BudgetControlService
+{
 
     /**
      * @var PurchaseService
@@ -23,7 +24,8 @@ class BudgetControlService {
      */
     private $goalr;
 
-    public function __construct(PurchaseService $purchase_service, Goalr $goalr) {
+    public function __construct(PurchaseService $purchase_service, Goalr $goalr)
+    {
         $this->purchase_service = $purchase_service;
         $this->goalr = $goalr;
     }
@@ -35,7 +37,8 @@ class BudgetControlService {
      *
      * @return float
      */
-    public function getDailyBudget(MonthlyGoal $monthly_goal, $manual_spent=null) {
+    public function getDailyBudget(MonthlyGoal $monthly_goal, $manual_spent = null)
+    {
         $date_start = new \DateTime();
         $date_start->setDate($monthly_goal->year, $monthly_goal->month, 1);
 
@@ -53,7 +56,10 @@ class BudgetControlService {
         if ($manual_spent !== null) {
             $spent += $manual_spent;
         }
-        $spent_today = $this->purchase_service->getAmountByPeriod($this->goalr->current_date, $this->goalr->current_date);
+        $spent_today = $this->purchase_service->getAmountByPeriod(
+            $this->goalr->current_date,
+            $this->goalr->current_date
+        );
         $daily_budget = $this->goalr->getDailyBudget($goal, $spent, $monthly_goal->events);
 
         return $daily_budget - $spent_today;

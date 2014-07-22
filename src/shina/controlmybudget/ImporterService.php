@@ -9,7 +9,8 @@
 namespace shina\controlmybudget;
 
 
-class ImporterService {
+class ImporterService
+{
 
     /**
      * @var Importer[]

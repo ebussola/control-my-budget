@@ -17,6 +17,7 @@ namespace shina\controlmybudget;
  * @property string    $place
  * @property float     $amount
  */
-interface Purchase {
+interface Purchase
+{
 
 }

@@ -11,21 +11,24 @@ namespace shina\controlmybudget;
 
 use ebussola\goalr\event\Event;
 
-class MonthlyGoalService {
+class MonthlyGoalService
+{
 
     /**
      * @var DataProvider
      */
     private $data_provider;
 
-    public function __construct(DataProvider $data_provider) {
+    public function __construct(DataProvider $data_provider)
+    {
         $this->data_provider = $data_provider;
     }
 
     /**
      * @param MonthlyGoal $monthly_goal
      */
-    public function save(MonthlyGoal $monthly_goal) {
+    public function save(MonthlyGoal $monthly_goal)
+    {
         if ($monthly_goal->id == null) {
             $id = $this->data_provider->insertMonthlyGoal($this->toArray($monthly_goal));
             $monthly_goal->id = $id;
@@ -39,7 +42,8 @@ class MonthlyGoalService {
      *
      * @return MonthlyGoal
      */
-    public function getMonthlyGoalById($monthly_goal_id) {
+    public function getMonthlyGoalById($monthly_goal_id)
+    {
         $data = $this->data_provider->findMonthlyGoalByIds([$monthly_goal_id]);
 
         $monthly_goals = array();
@@ -56,7 +60,8 @@ class MonthlyGoalService {
      *
      * @return MonthlyGoal[]
      */
-    public function getMonthlyGoalByMonthAndYear($month, $year) {
+    public function getMonthlyGoalByMonthAndYear($month, $year)
+    {
         $data = $this->data_provider->findMonthlyGoalsByMonthAndYear($month, $year);
 
         $monthly_goals = array();
@@ -73,7 +78,7 @@ class MonthlyGoalService {
      *
      * @return MonthlyGoal[]
      */
-    public function getAll($page=1, $page_size=null)
+    public function getAll($page = 1, $page_size = null)
     {
         $data = $this->data_provider->findAllMonthlyGoals($page, $page_size);
 
@@ -94,7 +99,8 @@ class MonthlyGoalService {
         return $this->data_provider->deleteMonthlyGoal($monthly_goal_id);
     }
 
-    private function toArray(MonthlyGoal $monthly_goal) {
+    private function toArray(MonthlyGoal $monthly_goal)
+    {
         return array(
             'id' => $monthly_goal->id,
             'month' => $monthly_goal->month,
@@ -107,7 +113,8 @@ class MonthlyGoalService {
     /**
      * @param Event[] $events
      */
-    private function eventsToArray($events) {
+    private function eventsToArray($events)
+    {
         foreach ($events as &$event) {
             $event = array(
                 'id' => $event->id,
@@ -125,25 +132,27 @@ class MonthlyGoalService {
     /**
      * @param $row
      */
-    private function createMonthlyGoal($row) {
+    private function createMonthlyGoal($row)
+    {
         $monthly_goal = new MonthlyGoal\MonthlyGoal();
         $monthly_goal->id = $row['id'];
         $monthly_goal->month = $row['month'];
         $monthly_goal->year = $row['year'];
-        $monthly_goal->amount_goal = (float) $row['amount_goal'];
+        $monthly_goal->amount_goal = (float)$row['amount_goal'];
         $monthly_goal->events = $this->createEvents($row['events']);
 
         return $monthly_goal;
     }
 
-    private function createEvents($events) {
+    private function createEvents($events)
+    {
         foreach ($events as &$event_data) {
             $obj = new Event();
             $obj->id = $event_data['id'];
             $obj->date_start = new \DateTime($event_data['date_start']);
             $obj->date_end = new \DateTime($event_data['date_end']);
             $obj->name = $event_data['name'];
-            $obj->variation = (float) $event_data['variation'];
+            $obj->variation = (float)$event_data['variation'];
             $obj->category = $event_data['category'];
 
             $event_data = $obj;

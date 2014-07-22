@@ -9,7 +9,8 @@
 namespace shina\controlmybudget\Purchase;
 
 
-class Purchase implements \shina\controlmybudget\Purchase {
+class Purchase implements \shina\controlmybudget\Purchase
+{
 
     public $id;
     public $date;

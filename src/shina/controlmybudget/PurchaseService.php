@@ -9,21 +9,24 @@
 namespace shina\controlmybudget;
 
 
-class PurchaseService {
+class PurchaseService
+{
 
     /**
      * @var DataProvider
      */
     private $data_provider;
 
-    public function __construct(DataProvider $data_provider) {
+    public function __construct(DataProvider $data_provider)
+    {
         $this->data_provider = $data_provider;
     }
 
     /**
      * @param Purchase $purchase
      */
-    public function save(Purchase $purchase) {
+    public function save(Purchase $purchase)
+    {
         $data = $this->toArray($purchase);
 
         $hash = md5(join('.', $data));
@@ -48,7 +51,8 @@ class PurchaseService {
      *
      * @return Purchase[]
      */
-    public function getPurchasesByPeriod(\DateTime $date_start, \DateTime $date_end) {
+    public function getPurchasesByPeriod(\DateTime $date_start, \DateTime $date_end)
+    {
         $data = $this->data_provider->findPurchasesByPeriod($date_start, $date_end);
 
         $purchases = array();
@@ -64,8 +68,9 @@ class PurchaseService {
      * @param \DateTime $date_end
      * @return float
      */
-    public function getAmountByPeriod(\DateTime $date_start, \DateTime $date_end) {
-        return (float) $this->data_provider->calcAmountByPeriod($date_start, $date_end);
+    public function getAmountByPeriod(\DateTime $date_start, \DateTime $date_end)
+    {
+        return (float)$this->data_provider->calcAmountByPeriod($date_start, $date_end);
     }
 
     /**
@@ -82,7 +87,8 @@ class PurchaseService {
      *
      * @return array
      */
-    private function toArray(Purchase $purchase) {
+    private function toArray(Purchase $purchase)
+    {
         return array(
             'id' => $purchase->id,
             'date' => $purchase->date->format('Y-m-d'),
@@ -96,12 +102,13 @@ class PurchaseService {
      *
      * @return Purchase
      */
-    private function createPurchase($row) {
+    private function createPurchase($row)
+    {
         $purchase = new Purchase\Purchase();
         $purchase->id = $row['id'];
         $purchase->date = new \DateTime($row['date']);
         $purchase->place = $row['place'];
-        $purchase->amount = (float) $row['amount'];
+        $purchase->amount = (float)$row['amount'];
 
         return $purchase;
     }
