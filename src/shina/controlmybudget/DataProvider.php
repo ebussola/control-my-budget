@@ -49,6 +49,12 @@ interface DataProvider {
     public function findPurchaseByHash($hash);
 
     /**
+     * @param $purchase_id
+     * @return bool
+     */
+    public function deletePurchase($purchase_id);
+
+    /**
      * @param array $data
      *
      * @return int
@@ -73,6 +79,11 @@ interface DataProvider {
     public function findMonthlyGoalsByMonthAndYear($month, $year);
 
     /**
+     * @return array
+     */
+    public function findAllMonthlyGoals($page=1, $page_size=null);
+
+    /**
      * @param \DateTime $date_start
      * @param \DateTime $date_end
      *
@@ -86,5 +97,11 @@ interface DataProvider {
      * @return MonthlyGoal[]
      */
     public function findMonthlyGoalByIds($monthly_goal_ids);
+
+    /**
+     * @param int $monthly_goal_id
+     * @return bool
+     */
+    public function deleteMonthlyGoal($monthly_goal_id);
 
 }

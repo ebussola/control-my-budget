@@ -67,6 +67,33 @@ class MonthlyGoalService {
         return $monthly_goals;
     }
 
+    /**
+     * @param int $page
+     * @param null|int $page_size
+     *
+     * @return MonthlyGoal[]
+     */
+    public function getAll($page=1, $page_size=null)
+    {
+        $data = $this->data_provider->findAllMonthlyGoals($page, $page_size);
+
+        $monthly_goals = array();
+        foreach ($data as $row) {
+            $monthly_goals[] = $this->createMonthlyGoal($row);
+        }
+
+        return $monthly_goals;
+    }
+
+    /**
+     * @param int $monthly_goal_id
+     * @return bool
+     */
+    public function delete($monthly_goal_id)
+    {
+        return $this->data_provider->deleteMonthlyGoal($monthly_goal_id);
+    }
+
     private function toArray(MonthlyGoal $monthly_goal) {
         return array(
             'id' => $monthly_goal->id,

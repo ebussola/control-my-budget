@@ -106,6 +106,20 @@ class PurchaseServiceTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(67.8, $this->purchase_service->getAmountByPeriod(new DateTime('2014-01-01'), new DateTime('2014-01-31')));
     }
 
+    public function testDelete()
+    {
+        $purchase = new \shina\controlmybudget\Purchase\Purchase();
+        $purchase->date = new DateTime('2013-12-25');
+        $purchase->place = 'Natalandia';
+        $purchase->amount = 300;
+        $this->purchase_service->save($purchase);
+
+        $this->purchase_service->delete($purchase->id);
+
+        $data = $this->conn->executeQuery('select * from purchase')->fetchAll();
+        $this->assertCount(0, $data);
+    }
+
     private function assertPurchaseData($row) {
         $this->assertNotNull($row['id']);
         $this->assertNotNull($row['date']);

@@ -238,4 +238,47 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider {
         }
     }
 
+    /**
+     * @param $purchase_id
+     * @return bool
+     */
+    public function deletePurchase($purchase_id)
+    {
+        return $this->conn->delete('purchase', ['id' => $purchase_id]) > 0;
+    }
+
+    /**
+     * @return \shina\controlmybudget\MonthlyGoal[]
+     */
+    public function findAllMonthlyGoals($page = 1, $page_size = null)
+    {
+        $query = $this->conn->createQueryBuilder();
+        $query->select('*')
+            ->from('monthly_goal', 'mg');
+
+        if ($page_size !== null) {
+            $query->setMaxResults($page_size)
+                ->setFirstResult(($page-1) * $page_size);
+        }
+
+        $data = $this->conn->executeQuery($query)->fetchAll();
+
+        foreach ($data as &$monthly_goal_data) {
+            $events_data = $this->conn->executeQuery('SELECT * FROM event WHERE monthly_goal_id = ?', array($monthly_goal_data['id']))
+                ->fetchAll();
+            $monthly_goal_data['events'] = $events_data;
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param int $monthly_goal_id
+     * @return bool
+     */
+    public function deleteMonthlyGoal($monthly_goal_id)
+    {
+        return $this->conn->delete('monthly_goal', ['id' => $monthly_goal_id]) > 0;
+    }
+
 }

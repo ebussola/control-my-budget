@@ -59,8 +59,22 @@ class PurchaseService {
         return $purchases;
     }
 
+    /**
+     * @param \DateTime $date_start
+     * @param \DateTime $date_end
+     * @return float
+     */
     public function getAmountByPeriod(\DateTime $date_start, \DateTime $date_end) {
         return (float) $this->data_provider->calcAmountByPeriod($date_start, $date_end);
+    }
+
+    /**
+     * @param string $purchase_id
+     * @return bool
+     */
+    public function delete($purchase_id)
+    {
+        return $this->data_provider->deletePurchase($purchase_id);
     }
 
     /**
