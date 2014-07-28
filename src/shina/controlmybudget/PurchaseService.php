@@ -46,6 +46,18 @@ class PurchaseService
     }
 
     /**
+     * @param int $purchase_id
+     * @return Purchase
+     */
+    public function getById($purchase_id)
+    {
+        $data = $this->data_provider->findPurchaseById($purchase_id);
+        $purchase = $this->createPurchase($data);
+
+        return $purchase;
+    }
+
+    /**
      * @param \DateTime $date_start
      * @param \DateTime $date_end
      *

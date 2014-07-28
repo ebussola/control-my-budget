@@ -120,6 +120,19 @@ class PurchaseServiceTest extends PHPUnit_Framework_TestCase {
         $this->assertCount(0, $data);
     }
 
+    public function testGetById()
+    {
+        $purchase = new \shina\controlmybudget\Purchase\Purchase();
+        $purchase->date = new DateTime('2013-12-25');
+        $purchase->place = 'Natalandia';
+        $purchase->amount = 300;
+        $this->purchase_service->save($purchase);
+
+        $purchase = $this->purchase_service->getById($purchase->id);
+
+        $this->assertInstanceOf('\shina\controlmybudget\Purchase', $purchase);
+    }
+
     private function assertPurchaseData($row) {
         $this->assertNotNull($row['id']);
         $this->assertNotNull($row['date']);

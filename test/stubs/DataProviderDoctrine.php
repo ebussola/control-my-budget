@@ -281,4 +281,16 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider {
         return $this->conn->delete('monthly_goal', ['id' => $monthly_goal_id]) > 0;
     }
 
+    /**
+     * @param int $purchase_id
+     * @return array
+     */
+    public function findPurchaseById($purchase_id)
+    {
+        $data = $this->conn->executeQuery('SELECT * FROM purchase WHERE id=?', array(
+                $purchase_id
+            ))->fetch();
+
+        return $data;
+    }
 }

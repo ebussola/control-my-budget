@@ -56,6 +56,12 @@ interface DataProvider
     public function deletePurchase($purchase_id);
 
     /**
+     * @param int $purchase_id
+     * @return array
+     */
+    public function findPurchaseById($purchase_id);
+
+    /**
      * @param array $data
      *
      * @return int
