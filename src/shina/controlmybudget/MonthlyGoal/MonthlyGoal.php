@@ -18,4 +18,9 @@ class MonthlyGoal implements \shina\controlmybudget\MonthlyGoal
     public $amount_goal;
     public $events;
 
+    public function __construct()
+    {
+        $this->events = [];
+    }
+
 }

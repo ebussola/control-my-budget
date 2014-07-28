@@ -47,6 +47,25 @@ class MonthlyGoalServiceTest extends PHPUnit_Framework_TestCase {
         }
     }
 
+    public function testSave_WithoutEvents()
+    {
+        $monthly_goal = new \shina\controlmybudget\MonthlyGoal\MonthlyGoal();
+        $monthly_goal->month = 5;
+        $monthly_goal->year = 2014;
+        $monthly_goal->amount_goal = 1000;
+
+        $this->monthly_goal_service->save($monthly_goal);
+
+        $data = $this->conn->executeQuery('SELECT * FROM monthly_goal')->fetchAll();
+        $this->assertCount(1, $data);
+        foreach ($data as $row) {
+            $this->assertMonthlyGoalData($row);
+        }
+
+        $data = $this->conn->executeQuery('SELECT * FROM event')->fetchAll();
+        $this->assertCount(0, $data);
+    }
+
     public function testGetMonthlyGoalByMonthAndYear() {
         $monthly_goal = $this->createExampleGoal();
         $this->monthly_goal_service->save($monthly_goal);
