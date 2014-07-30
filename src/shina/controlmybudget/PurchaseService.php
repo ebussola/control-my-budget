@@ -32,8 +32,8 @@ class PurchaseService
         $hash = md5(join('.', $data));
         if (!$this->data_provider->findPurchaseByHash($hash)) {
 
-            $data['hash'] = $hash;
             if ($purchase->id == null) {
+                $data['hash'] = $hash;
                 $id = $this->data_provider->insertPurchase($data);
                 $purchase->id = $id;
             } else {

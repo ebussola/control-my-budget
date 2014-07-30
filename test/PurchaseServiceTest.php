@@ -40,10 +40,20 @@ class PurchaseServiceTest extends PHPUnit_Framework_TestCase {
         $this->purchase_service->save($purchase);
         $this->assertNotNull($purchase->id);
 
-        $data = $this->conn->executeQuery('SELECT * FROM purchase');
+        $data = $this->conn->executeQuery('SELECT * FROM purchase')->fetchAll();
+        $this->assertCount(1, $data);
         foreach ($data as $row) {
             $this->assertPurchaseData($row);
         }
+
+        // If the purchase is edited, its hash can't change
+        $current_hash = reset($data)['hash'];
+        $purchase->amount = 2;
+        $this->purchase_service->save($purchase);
+
+        $data = $this->conn->executeQuery('SELECT * FROM purchase where id=?', [$purchase->id])->fetch();
+        $this->assertPurchaseData($data);
+        $this->assertEquals($current_hash, $data['hash']);
     }
 
     public function testGetPurchasesByPeriod() {
