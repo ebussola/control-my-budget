@@ -1,4 +1,6 @@
 <?php
+use ebussola\common\datatype\datetime\Date;
+
 /**
  * Created by PhpStorm.
  * User: Leonardo Shinagawa
@@ -18,6 +20,11 @@ class PurchaseServiceTest extends PHPUnit_Framework_TestCase {
      */
     private $conn;
 
+    /**
+     * @var \shina\controlmybudget\DataProvider
+     */
+    private $data_provider;
+
     public function setUp() {
         $this->conn = \Doctrine\DBAL\DriverManager::getConnection(array(
             'driver' => 'pdo_sqlite',
@@ -26,9 +33,9 @@ class PurchaseServiceTest extends PHPUnit_Framework_TestCase {
             'memory' => true
         ));
 
-        $data_provider = new DataProviderDoctrine($this->conn);
+        $this->data_provider = new DataProviderDoctrine($this->conn);
 
-        $this->purchase_service = new \shina\controlmybudget\PurchaseService($data_provider);
+        $this->purchase_service = new \shina\controlmybudget\PurchaseService($this->data_provider);
     }
 
     public function testSave() {
@@ -42,6 +49,7 @@ class PurchaseServiceTest extends PHPUnit_Framework_TestCase {
 
         $data = $this->conn->executeQuery('SELECT * FROM purchase')->fetchAll();
         $this->assertCount(1, $data);
+        $this->assertEquals(0, reset($data)['is_forecast']);
         foreach ($data as $row) {
             $this->assertPurchaseData($row);
         }
@@ -54,6 +62,19 @@ class PurchaseServiceTest extends PHPUnit_Framework_TestCase {
         $data = $this->conn->executeQuery('SELECT * FROM purchase where id=?', [$purchase->id])->fetch();
         $this->assertPurchaseData($data);
         $this->assertEquals($current_hash, $data['hash']);
+    }
+
+    public function testSaveFuturePurchase()
+    {
+        $purchase = new \shina\controlmybudget\Purchase\Purchase();
+        $purchase->date = new DateTime('+5 days');
+        $purchase->place = 'Zona Sul';
+        $purchase->amount = 2.1;
+
+        $this->purchase_service->save($purchase);
+
+        $data = $this->conn->executeQuery('SELECT * FROM purchase')->fetchAll();
+        $this->assertEquals(1, reset($data)['is_forecast']);
     }
 
     public function testGetPurchasesByPeriod() {
@@ -86,6 +107,31 @@ class PurchaseServiceTest extends PHPUnit_Framework_TestCase {
         foreach ($purchases as $purchase) {
             $this->assertPurchaseObject($purchase);
         }
+    }
+
+    public function testGetForecastAmountByPeriod() {
+        $purchase_service = new \shina\controlmybudget\PurchaseService($this->data_provider, new Date('2014-08-15'));
+
+        $purchase = new \shina\controlmybudget\Purchase\Purchase();
+        $purchase->date = new DateTime('2014-08-10');
+        $purchase->place = 'Zona Sul';
+        $purchase->amount = 2.1;
+        $purchase_service->save($purchase);
+
+        $purchase = new \shina\controlmybudget\Purchase\Purchase();
+        $purchase->date = new DateTime('2014-08-15');
+        $purchase->place = 'Natalandia';
+        $purchase->amount = 300;
+        $purchase_service->save($purchase);
+
+        $purchase = new \shina\controlmybudget\Purchase\Purchase();
+        $purchase->date = new DateTime('2014-08-18');
+        $purchase->place = 'Casa do carnaval';
+        $purchase->amount = 54.70;
+        $purchase_service->save($purchase);
+
+        $amount = $purchase_service->getForecastAmountByPeriod(new DateTime('2014-08-01'), new DateTime('2014-08-31'));
+        $this->assertEquals(54.70, $amount);
     }
 
     public function testGetAmountByPeriod() {

@@ -93,10 +93,11 @@ interface DataProvider
     /**
      * @param \DateTime $date_start
      * @param \DateTime $date_end
+     * @param boolean   $only_forecast
      *
      * @return float
      */
-    public function calcAmountByPeriod(\DateTime $date_start, \DateTime $date_end);
+    public function calcAmountByPeriod(\DateTime $date_start, \DateTime $date_end, $only_forecast=false);
 
     /**
      * @param int[] $monthly_goal_ids

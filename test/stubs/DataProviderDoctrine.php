@@ -156,10 +156,13 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider {
      *
      * @return float
      */
-    public function calcAmountByPeriod(\DateTime $date_start, \DateTime $date_end) {
+    public function calcAmountByPeriod(\DateTime $date_start, \DateTime $date_end, $only_forecast=false) {
         $data = $this->findPurchasesByPeriod($date_start, $date_end);
         $amount = 0;
         foreach ($data as $row) {
+            if ($only_forecast && !$row['is_forecast']) {
+                continue;
+            }
             $amount += $row['amount'];
         }
 
@@ -200,6 +203,7 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider {
         $table1->addColumn('place', 'string');
         $table1->addColumn('amount', 'float');
         $table1->addColumn('hash', 'string');
+        $table1->addColumn('is_forecast', 'boolean');
 
         $table2 = $schema->createTable('monthly_goal');
         $table2->addColumn('id', 'integer');

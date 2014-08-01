@@ -6,6 +6,7 @@
  * Time: 14:07
  */
 
+use ebussola\common\datatype\datetime\Date;
 use ebussola\goalr\Goalr;
 
 class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
@@ -20,6 +21,11 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
      */
     private $purchase_service;
 
+    /**
+     * @var \shina\controlmybudget\DataProvider
+     */
+    private $data_provider;
+
     public function setUp() {
         $goalr = new Goalr();
         $conn = \Doctrine\DBAL\DriverManager::getConnection(array(
@@ -28,9 +34,9 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
             'password' => 'root',
             'memory' => true
         ));
-        $data_provider = new DataProviderDoctrine($conn);
-        $purchase_service = new \shina\controlmybudget\PurchaseService($data_provider);
-        $this->purchase_service = new \shina\controlmybudget\PurchaseService($data_provider);
+        $this->data_provider = new DataProviderDoctrine($conn);
+        $purchase_service = new \shina\controlmybudget\PurchaseService($this->data_provider);
+        $this->purchase_service = new \shina\controlmybudget\PurchaseService($this->data_provider);
         $this->budget_control_service = new \shina\controlmybudget\BudgetControlService($purchase_service, $goalr);
     }
 
@@ -91,31 +97,31 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
     public function testDecreaseTodaysPurchases()
     {
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
-        $purchase->date = new \ebussola\common\datatype\datetime\Date('2014-06-01');
+        $purchase->date = new Date('2014-06-01');
         $purchase->place = 'foo';
         $purchase->amount = 700;
         $this->purchase_service->save($purchase);
 
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
-        $purchase->date = new \ebussola\common\datatype\datetime\Date('2014-06-15');
+        $purchase->date = new Date('2014-06-15');
         $purchase->place = 'foo';
         $purchase->amount = 50;
         $this->purchase_service->save($purchase);
 
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
-        $purchase->date = new \ebussola\common\datatype\datetime\Date('2014-06-16');
+        $purchase->date = new Date('2014-06-16');
         $purchase->place = 'foo';
         $purchase->amount = 25;
         $this->purchase_service->save($purchase);
 
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
-        $purchase->date = new \ebussola\common\datatype\datetime\Date('2014-06-16');
+        $purchase->date = new Date('2014-06-16');
         $purchase->place = 'foobar';
         $purchase->amount = 25;
         $this->purchase_service->save($purchase);
 
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
-        $purchase->date = new \ebussola\common\datatype\datetime\Date('2014-06-17');
+        $purchase->date = new Date('2014-06-17');
         $purchase->place = 'bar';
         $purchase->amount = 30;
         $this->purchase_service->save($purchase);
@@ -126,40 +132,62 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
         $monthly_goal->amount_goal = 1500;
         $monthly_goal->events = [];
 
-        $goalr = new Goalr(new \ebussola\common\datatype\datetime\Date('2014-06-17'));
+        $goalr = new Goalr(new Date('2014-06-17'));
         $budget_control_service = new \shina\controlmybudget\BudgetControlService($this->purchase_service, $goalr);
 
         $this->assertEquals(20, $budget_control_service->getDailyBudget($monthly_goal));
     }
 
+    public function testDontDecreaseTodays_ButForecast_Purchases()
+    {
+        $purchase_service = new \shina\controlmybudget\PurchaseService($this->data_provider, new Date('2014-08-01'));
+
+        $purchase = new \shina\controlmybudget\Purchase\Purchase();
+        $purchase->date = new Date('2014-08-02');
+        $purchase->place = 'foo';
+        $purchase->amount = 10;
+        $purchase_service->save($purchase);
+
+        $monthly_goal = new \shina\controlmybudget\MonthlyGoal\MonthlyGoal();
+        $monthly_goal->month = 8;
+        $monthly_goal->year = 2014;
+        $monthly_goal->amount_goal = 1510;
+        $monthly_goal->events = [];
+
+        $goalr = new Goalr(new Date('2014-08-02'));
+        $budget_control_service = new \shina\controlmybudget\BudgetControlService($this->purchase_service, $goalr);
+
+        $this->assertEquals(50, $budget_control_service->getDailyBudget($monthly_goal));
+    }
+
     public function testSpentSimulation()
     {
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
-        $purchase->date = new \ebussola\common\datatype\datetime\Date('2014-06-01');
+        $purchase->date = new Date('2014-06-01');
         $purchase->place = 'foo';
         $purchase->amount = 700;
         $this->purchase_service->save($purchase);
 
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
-        $purchase->date = new \ebussola\common\datatype\datetime\Date('2014-06-15');
+        $purchase->date = new Date('2014-06-15');
         $purchase->place = 'foo';
         $purchase->amount = 50;
         $this->purchase_service->save($purchase);
 
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
-        $purchase->date = new \ebussola\common\datatype\datetime\Date('2014-06-16');
+        $purchase->date = new Date('2014-06-16');
         $purchase->place = 'foo';
         $purchase->amount = 25;
         $this->purchase_service->save($purchase);
 
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
-        $purchase->date = new \ebussola\common\datatype\datetime\Date('2014-06-16');
+        $purchase->date = new Date('2014-06-16');
         $purchase->place = 'foobar';
         $purchase->amount = 25;
         $this->purchase_service->save($purchase);
 
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
-        $purchase->date = new \ebussola\common\datatype\datetime\Date('2014-06-17');
+        $purchase->date = new Date('2014-06-17');
         $purchase->place = 'bar';
         $purchase->amount = 30;
         $this->purchase_service->save($purchase);
@@ -170,7 +198,7 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
         $monthly_goal->amount_goal = 1500;
         $monthly_goal->events = [];
 
-        $goalr = new Goalr(new \ebussola\common\datatype\datetime\Date('2014-06-17'));
+        $goalr = new Goalr(new Date('2014-06-17'));
         $budget_control_service = new \shina\controlmybudget\BudgetControlService($this->purchase_service, $goalr);
 
         $this->assertEquals(2, $budget_control_service->getDailyBudget($monthly_goal, 252));
@@ -179,13 +207,13 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
     public function testForecastPurchase()
     {
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
-        $purchase->date = new \ebussola\common\datatype\datetime\Date('2014-08-10');
+        $purchase->date = new Date('2014-08-10');
         $purchase->place = 'foo';
         $purchase->amount = 500;
         $this->purchase_service->save($purchase);
 
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
-        $purchase->date = new \ebussola\common\datatype\datetime\Date('2014-08-15');
+        $purchase->date = new Date('2014-08-15');
         $purchase->place = 'bar';
         $purchase->amount = 70;
         $this->purchase_service->save($purchase);
@@ -196,7 +224,7 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
         $monthly_goal->amount_goal = 1500;
         $monthly_goal->events = [];
 
-        $goalr = new Goalr(new \ebussola\common\datatype\datetime\Date('2014-08-01'));
+        $goalr = new Goalr(new Date('2014-08-01'));
         $budget_control_service = new \shina\controlmybudget\BudgetControlService($this->purchase_service, $goalr);
 
         $this->assertEquals(30, $budget_control_service->getDailyBudget($monthly_goal));

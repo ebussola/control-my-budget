@@ -16,5 +16,6 @@ class Purchase implements \shina\controlmybudget\Purchase
     public $date;
     public $place;
     public $amount;
+    public $is_forecast;
 
 }

@@ -16,6 +16,7 @@ namespace shina\controlmybudget;
  * @property \DateTime $date
  * @property string    $place
  * @property float     $amount
+ * @property bool      $is_forecast
  */
 interface Purchase
 {

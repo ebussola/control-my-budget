@@ -9,6 +9,8 @@
 namespace shina\controlmybudget;
 
 
+use ebussola\common\datatype\datetime\Date;
+
 class PurchaseService
 {
 
@@ -17,9 +19,19 @@ class PurchaseService
      */
     private $data_provider;
 
-    public function __construct(DataProvider $data_provider)
+    /**
+     * @var Date
+     */
+    private $current_date;
+
+    public function __construct(DataProvider $data_provider, Date $current_date=null)
     {
+        if ($current_date === null) {
+            $current_date = new Date('today');
+        }
+
         $this->data_provider = $data_provider;
+        $this->current_date = $current_date;
     }
 
     /**
@@ -31,6 +43,12 @@ class PurchaseService
 
         $hash = md5(join('.', $data));
         if (!$this->data_provider->findPurchaseByHash($hash)) {
+
+            if ($purchase->date > $this->current_date) {
+                $data['is_forecast'] = 1;
+            } else {
+                $data['is_forecast'] = 0;
+            }
 
             if ($purchase->id == null) {
                 $data['hash'] = $hash;
@@ -83,6 +101,16 @@ class PurchaseService
     public function getAmountByPeriod(\DateTime $date_start, \DateTime $date_end)
     {
         return (float)$this->data_provider->calcAmountByPeriod($date_start, $date_end);
+    }
+
+    /**
+     * @param \DateTime $date_start
+     * @param \DateTime $date_end
+     * @return float
+     */
+    public function getForecastAmountByPeriod(\DateTime $date_start, \DateTime $date_end)
+    {
+        return (float)$this->data_provider->calcAmountByPeriod($date_start, $date_end, true);
     }
 
     /**

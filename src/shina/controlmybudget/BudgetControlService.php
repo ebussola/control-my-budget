@@ -54,15 +54,22 @@ class BudgetControlService
         $yesterday->modify('-1 day');
         $tomorrow = clone $this->goalr->current_date;
         $tomorrow->modify('+1 day');
+        $forecast_amount_today = $this->purchase_service->getForecastAmountByPeriod(
+            $this->goalr->current_date,
+            $this->goalr->current_date
+        );
+
         $spent = $this->purchase_service->getAmountByPeriod($date_start, $yesterday)
-            + $this->purchase_service->getAmountByPeriod($tomorrow, $date_end);
+            + $this->purchase_service->getAmountByPeriod($tomorrow, $date_end)
+            + $forecast_amount_today;
+
         if ($manual_spent !== null) {
             $spent += $manual_spent;
         }
         $spent_today = $this->purchase_service->getAmountByPeriod(
-            $this->goalr->current_date,
-            $this->goalr->current_date
-        );
+                $this->goalr->current_date,
+                $this->goalr->current_date
+            ) - $forecast_amount_today;
         $daily_budget = $this->goalr->getDailyBudget($goal, $spent, $monthly_goal->events);
 
         return $daily_budget - $spent_today;
