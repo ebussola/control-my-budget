@@ -176,5 +176,31 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals(2, $budget_control_service->getDailyBudget($monthly_goal, 252));
     }
 
+    public function testForecastPurchase()
+    {
+        $purchase = new \shina\controlmybudget\Purchase\Purchase();
+        $purchase->date = new \ebussola\common\datatype\datetime\Date('2014-08-10');
+        $purchase->place = 'foo';
+        $purchase->amount = 500;
+        $this->purchase_service->save($purchase);
+
+        $purchase = new \shina\controlmybudget\Purchase\Purchase();
+        $purchase->date = new \ebussola\common\datatype\datetime\Date('2014-08-15');
+        $purchase->place = 'bar';
+        $purchase->amount = 70;
+        $this->purchase_service->save($purchase);
+
+        $monthly_goal = new \shina\controlmybudget\MonthlyGoal\MonthlyGoal();
+        $monthly_goal->month = 8;
+        $monthly_goal->year = 2014;
+        $monthly_goal->amount_goal = 1500;
+        $monthly_goal->events = [];
+
+        $goalr = new Goalr(new \ebussola\common\datatype\datetime\Date('2014-08-01'));
+        $budget_control_service = new \shina\controlmybudget\BudgetControlService($this->purchase_service, $goalr);
+
+        $this->assertEquals(30, $budget_control_service->getDailyBudget($monthly_goal));
+    }
+
 }
  

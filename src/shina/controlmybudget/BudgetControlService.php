@@ -52,7 +52,10 @@ class BudgetControlService
 
         $yesterday = clone $this->goalr->current_date;
         $yesterday->modify('-1 day');
-        $spent = $this->purchase_service->getAmountByPeriod($date_start, $yesterday);
+        $tomorrow = clone $this->goalr->current_date;
+        $tomorrow->modify('+1 day');
+        $spent = $this->purchase_service->getAmountByPeriod($date_start, $yesterday)
+            + $this->purchase_service->getAmountByPeriod($tomorrow, $date_end);
         if ($manual_spent !== null) {
             $spent += $manual_spent;
         }
