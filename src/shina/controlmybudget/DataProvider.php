@@ -112,4 +112,47 @@ interface DataProvider
      */
     public function deleteMonthlyGoal($monthly_goal_id);
 
+    /**
+     * @param int $user_id
+     * @return array
+     */
+    public function findUserById($user_id);
+
+    /**
+     * @param string $email
+     * @return array
+     */
+    public function findUserByEmail($email);
+
+    /**
+     * @param int $page
+     * @param int | null $page_size
+     * @return array
+     */
+    public function findAllUsers($page=1, $page_size=null);
+
+    /**
+     * @param array $data
+     * @return int
+     */
+    public function insertUser($data);
+
+    /**
+     * @param int $id
+     * @param array $data
+     */
+    public function updateUser($id, $data);
+
+    /**
+     * @param int $user_id
+     * @return int
+     */
+    public function deleteUser($user_id);
+
+    /**
+     * @param string $access_token
+     * @return array
+     */
+    public function findUserByAccessToken($access_token);
+
 }
