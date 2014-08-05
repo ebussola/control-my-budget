@@ -110,6 +110,15 @@ class UserService {
     }
 
     /**
+     * @param User $user
+     * @return bool
+     */
+    public function validateToken(User $user)
+    {
+        return $user->facebook_access_token['expires'] > time();
+    }
+
+    /**
      * @param array $data
      * @return User
      */

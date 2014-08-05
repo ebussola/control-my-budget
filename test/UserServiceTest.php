@@ -141,6 +141,17 @@ class UserServiceTest extends PHPUnit_Framework_TestCase
         $this->assertFalse($this->user_service->delete(0));
     }
 
+    public function testValidateToken()
+    {
+        $user = $this->createRandomUser();
+
+        $user->facebook_access_token['expires'] = time();
+        $this->assertFalse($this->user_service->validateToken($user));
+
+        $user->facebook_access_token['expires'] = time() + 1000;
+        $this->assertTrue($this->user_service->validateToken($user));
+    }
+
     /**
      * @return \shina\controlmybudget\User
      */
