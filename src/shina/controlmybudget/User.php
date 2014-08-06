@@ -27,6 +27,11 @@ class User {
     public $name;
 
     /**
+     * @var string
+     */
+    public $facebook_user_id;
+
+    /**
      * @var array
      */
     public $facebook_access_token;

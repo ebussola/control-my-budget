@@ -257,6 +257,7 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider
         $table4->addColumn('email', 'string');
         $table4->addColumn('name', 'string');
         $table4->addColumn('facebook_access_token', 'string');
+        $table4->addColumn('facebook_user_id', 'string');
         $table4->addColumn('access_token', 'string', ['notnull' => false]);
 
         $sqls = $schema->toSql($this->conn->getDatabasePlatform());

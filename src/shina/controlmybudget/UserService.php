@@ -8,6 +8,7 @@
 
 namespace shina\controlmybudget;
 
+use Guzzle\Http\ClientInterface;
 
 class UserService {
 
@@ -16,9 +17,15 @@ class UserService {
      */
     protected $data_provider;
 
-    public function __construct(DataProvider $data_provider)
+    /**
+     * @var ClientInterface
+     */
+    protected $http;
+
+    public function __construct(DataProvider $data_provider, ClientInterface $http)
     {
         $this->data_provider = $data_provider;
+        $this->http = $http;
     }
 
     /**
@@ -115,7 +122,18 @@ class UserService {
      */
     public function validateToken(User $user)
     {
-        return $user->facebook_access_token['expires'] > time();
+        $is_time_valid = $user->facebook_access_token['expires'] > time();
+
+        if ($is_time_valid) {
+            $me = $this->http
+                ->get('http://graph.facebook.com/me')
+                ->send()
+                ->json();
+
+            return ($me['id'] == $user->facebook_user_id);
+        }
+
+        return false;
     }
 
     /**
@@ -128,6 +146,7 @@ class UserService {
         $user->id = $data['id'];
         $user->name = $data['name'];
         $user->email = $data['email'];
+        $user->facebook_user_id = $data['facebook_user_id'];
         $user->facebook_access_token = unserialize($data['facebook_access_token']);
 
         return $user;
@@ -143,6 +162,7 @@ class UserService {
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
+            'facebook_user_id' => $user->facebook_user_id,
             'facebook_access_token' => serialize($user->facebook_access_token)
         ];
     }

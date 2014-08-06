@@ -1,11 +1,11 @@
 <?php
+
 /**
  * Created by PhpStorm.
  * User: Leonardo Shinagawa
  * Date: 05/08/14
  * Time: 13:48
  */
-
 class UserServiceTest extends PHPUnit_Framework_TestCase
 {
 
@@ -19,16 +19,24 @@ class UserServiceTest extends PHPUnit_Framework_TestCase
      */
     protected $conn;
 
+    /**
+     * @var \Guzzle\Http\ClientInterface
+     */
+    protected $http;
+
     public function setup()
     {
-        $this->conn = \Doctrine\DBAL\DriverManager::getConnection(array(
+        $this->conn = \Doctrine\DBAL\DriverManager::getConnection(
+            array(
                 'driver' => 'pdo_sqlite',
                 'user' => 'root',
                 'password' => 'root',
                 'memory' => true
-            ));
+            )
+        );
         $data_provider = new DataProviderDoctrine($this->conn);
-        $this->user_service = new \shina\controlmybudget\UserService($data_provider);
+        $this->http = new \Guzzle\Http\Client();
+        $this->user_service = new \shina\controlmybudget\UserService($data_provider, $this->http);
     }
 
     public function testSave()
@@ -42,6 +50,7 @@ class UserServiceTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($data['id'], $user->id);
         $this->assertEquals($data['name'], $user->name);
         $this->assertEquals($data['email'], $user->email);
+        $this->assertEquals($data['facebook_user_id'], $user->facebook_user_id);
         $this->assertEquals(unserialize($data['facebook_access_token']), $user->facebook_access_token);
 
         // UPDATE
@@ -143,13 +152,42 @@ class UserServiceTest extends PHPUnit_Framework_TestCase
 
     public function testValidateToken()
     {
-        $user = $this->createRandomUser();
+        $user = $this->createUser();
+
+        $mock_plugin = new \Guzzle\Plugin\Mock\MockPlugin();
+        $mock_plugin->addResponse(
+            new \Guzzle\Http\Message\Response(200, [], json_encode(
+                [
+                    'id' => $user->facebook_user_id
+                ]
+            )
+        ));
+        $this->http->addSubscriber($mock_plugin);
+
 
         $user->facebook_access_token['expires'] = time();
         $this->assertFalse($this->user_service->validateToken($user));
 
         $user->facebook_access_token['expires'] = time() + 1000;
         $this->assertTrue($this->user_service->validateToken($user));
+    }
+
+    public function testValidateToken_Invalid()
+    {
+        $user = $this->createUser();
+
+        $mock_plugin = new \Guzzle\Plugin\Mock\MockPlugin();
+        $mock_plugin->addResponse(
+            new \Guzzle\Http\Message\Response(200, [], json_encode(
+                [
+                    'id' => 'anotheruserid'
+                ]
+            )
+        ));
+        $this->http->addSubscriber($mock_plugin);
+        $user->facebook_access_token['expires'] = time() + 1000;
+
+        $this->assertFalse($this->user_service->validateToken($user));
     }
 
     /**
@@ -160,6 +198,7 @@ class UserServiceTest extends PHPUnit_Framework_TestCase
         $user = new \shina\controlmybudget\User();
         $user->name = 'Foo';
         $user->email = 'foo@bar.com';
+        $user->facebook_user_id = 'myuseridonfacebook';
         $user->facebook_access_token = [
             'access_token' => md5(time()),
             'expires' => time() + 3600
@@ -177,6 +216,7 @@ class UserServiceTest extends PHPUnit_Framework_TestCase
         $this->assertNotNull($user->id);
         $this->assertNotNull($user->name);
         $this->assertNotNull($user->email);
+        $this->assertNotNull($user->facebook_user_id);
         $this->assertNotNull($user->facebook_access_token);
         $this->assertTrue(is_array($user->facebook_access_token));
     }
@@ -186,6 +226,7 @@ class UserServiceTest extends PHPUnit_Framework_TestCase
         $user = new \shina\controlmybudget\User();
         $user->name = md5(rand(0, 1000) * rand(0, 1000));
         $user->email = md5(rand(0, 1000) * rand(0, 1000)) . '@' . md5(rand(0, 1000) * rand(0, 1000)) . '.com';
+        $user->facebook_user_id = md5(rand(0, 1000) * rand(0, 1000));
         $user->facebook_access_token = [
             'access_token' => md5(time() . rand(0, 1000)),
             'expires' => time() + 3600 + rand(0, 1000)
