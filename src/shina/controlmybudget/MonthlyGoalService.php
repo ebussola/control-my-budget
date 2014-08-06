@@ -26,14 +26,15 @@ class MonthlyGoalService
 
     /**
      * @param MonthlyGoal $monthly_goal
+     * @param User $user
      */
-    public function save(MonthlyGoal $monthly_goal)
+    public function save(MonthlyGoal $monthly_goal, User $user)
     {
         if ($monthly_goal->id == null) {
-            $id = $this->data_provider->insertMonthlyGoal($this->toArray($monthly_goal));
+            $id = $this->data_provider->insertMonthlyGoal($this->toArray($monthly_goal, $user));
             $monthly_goal->id = $id;
         } else {
-            $this->data_provider->updateMonthlyGoal($monthly_goal->id, $this->toArray($monthly_goal));
+            $this->data_provider->updateMonthlyGoal($monthly_goal->id, $this->toArray($monthly_goal, $user));
         }
     }
 
@@ -57,12 +58,13 @@ class MonthlyGoalService
     /**
      * @param int $month
      * @param int $year
+     * @param User $user
      *
      * @return MonthlyGoal[]
      */
-    public function getMonthlyGoalByMonthAndYear($month, $year)
+    public function getMonthlyGoalByMonthAndYear($month, $year, User $user)
     {
-        $data = $this->data_provider->findMonthlyGoalsByMonthAndYear($month, $year);
+        $data = $this->data_provider->findMonthlyGoalsByMonthAndYear($month, $year, $user->id);
 
         $monthly_goals = array();
         foreach ($data as $row) {
@@ -73,14 +75,15 @@ class MonthlyGoalService
     }
 
     /**
+     * @param User $user
      * @param int $page
      * @param null|int $page_size
      *
      * @return MonthlyGoal[]
      */
-    public function getAll($page = 1, $page_size = null)
+    public function getAll(User $user, $page = 1, $page_size = null)
     {
-        $data = $this->data_provider->findAllMonthlyGoals($page, $page_size);
+        $data = $this->data_provider->findAllMonthlyGoals($user->id, $page, $page_size);
 
         $monthly_goals = array();
         foreach ($data as $row) {
@@ -99,14 +102,15 @@ class MonthlyGoalService
         return $this->data_provider->deleteMonthlyGoal($monthly_goal_id);
     }
 
-    private function toArray(MonthlyGoal $monthly_goal)
+    private function toArray(MonthlyGoal $monthly_goal, User $user)
     {
         return array(
             'id' => $monthly_goal->id,
             'month' => $monthly_goal->month,
             'year' => $monthly_goal->year,
             'amount_goal' => $monthly_goal->amount_goal,
-            'events' => $this->eventsToArray($monthly_goal->events)
+            'events' => $this->eventsToArray($monthly_goal->events),
+            'user_id' => $user->id
         );
     }
 

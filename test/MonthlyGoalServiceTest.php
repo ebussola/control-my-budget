@@ -1,4 +1,6 @@
 <?php
+use shina\controlmybudget\User;
+
 /**
  * Created by PhpStorm.
  * User: Leonardo Shinagawa
@@ -18,6 +20,11 @@ class MonthlyGoalServiceTest extends PHPUnit_Framework_TestCase {
      */
     private $conn;
 
+    /**
+     * @var User
+     */
+    private $user;
+
     public function setUp() {
         $this->conn = \Doctrine\DBAL\DriverManager::getConnection(array(
             'driver' => 'pdo_sqlite',
@@ -27,12 +34,15 @@ class MonthlyGoalServiceTest extends PHPUnit_Framework_TestCase {
         ));
         $data_provider = new DataProviderDoctrine($this->conn);
         $this->monthly_goal_service = new \shina\controlmybudget\MonthlyGoalService($data_provider);
+
+        $this->user = new User();
+        $this->user->id = 1;
     }
 
     public function testSave() {
         $monthly_goal = $this->createExampleGoal();
 
-        $this->monthly_goal_service->save($monthly_goal);
+        $this->monthly_goal_service->save($monthly_goal, $this->user);
 
         $data = $this->conn->executeQuery('SELECT * FROM monthly_goal')->fetchAll();
         $this->assertCount(1, $data);
@@ -54,7 +64,7 @@ class MonthlyGoalServiceTest extends PHPUnit_Framework_TestCase {
         $monthly_goal->year = 2014;
         $monthly_goal->amount_goal = 1000;
 
-        $this->monthly_goal_service->save($monthly_goal);
+        $this->monthly_goal_service->save($monthly_goal, $this->user);
 
         $data = $this->conn->executeQuery('SELECT * FROM monthly_goal')->fetchAll();
         $this->assertCount(1, $data);
@@ -68,11 +78,11 @@ class MonthlyGoalServiceTest extends PHPUnit_Framework_TestCase {
 
     public function testGetMonthlyGoalByMonthAndYear() {
         $monthly_goal = $this->createExampleGoal();
-        $this->monthly_goal_service->save($monthly_goal);
+        $this->monthly_goal_service->save($monthly_goal, $this->user);
         $monthly_goal = $this->createExampleGoal2();
-        $this->monthly_goal_service->save($monthly_goal);
+        $this->monthly_goal_service->save($monthly_goal, $this->user);
 
-        $monthly_goals = $this->monthly_goal_service->getMonthlyGoalByMonthAndYear(1, 2014);
+        $monthly_goals = $this->monthly_goal_service->getMonthlyGoalByMonthAndYear(1, 2014, $this->user);
         $this->assertCount(1, $monthly_goals);
         foreach ($monthly_goals as $monthly_goal) {
             $this->assertMonthlyGoalObj($monthly_goal);
@@ -81,9 +91,9 @@ class MonthlyGoalServiceTest extends PHPUnit_Framework_TestCase {
 
     public function testGetMonthlyGoalById() {
         $monthly_goal1 = $this->createExampleGoal();
-        $this->monthly_goal_service->save($monthly_goal1);
+        $this->monthly_goal_service->save($monthly_goal1, $this->user);
         $monthly_goal2 = $this->createExampleGoal2();
-        $this->monthly_goal_service->save($monthly_goal2);
+        $this->monthly_goal_service->save($monthly_goal2, $this->user);
 
         $monthly_goal = $this->monthly_goal_service->getMonthlyGoalById(2);
         $this->assertEquals($monthly_goal->id, $monthly_goal2->id);
@@ -93,11 +103,11 @@ class MonthlyGoalServiceTest extends PHPUnit_Framework_TestCase {
     public function testGetAll()
     {
         $monthly_goal1 = $this->createExampleGoal();
-        $this->monthly_goal_service->save($monthly_goal1);
+        $this->monthly_goal_service->save($monthly_goal1, $this->user);
         $monthly_goal2 = $this->createExampleGoal2();
-        $this->monthly_goal_service->save($monthly_goal2);
+        $this->monthly_goal_service->save($monthly_goal2, $this->user);
 
-        $monthly_goals = $this->monthly_goal_service->getAll();
+        $monthly_goals = $this->monthly_goal_service->getAll($this->user);
 
         $this->assertCount(2, $monthly_goals);
         foreach ($monthly_goals as $monthly_goal) {
@@ -108,7 +118,7 @@ class MonthlyGoalServiceTest extends PHPUnit_Framework_TestCase {
     public function testDelete()
     {
         $monthly_goal = $this->createExampleGoal();
-        $this->monthly_goal_service->save($monthly_goal);
+        $this->monthly_goal_service->save($monthly_goal, $this->user);
 
         $this->monthly_goal_service->delete($monthly_goal->id);
 
@@ -121,6 +131,7 @@ class MonthlyGoalServiceTest extends PHPUnit_Framework_TestCase {
         $this->assertNotNull($row['month']);
         $this->assertNotNull($row['year']);
         $this->assertNotNull($row['amount_goal']);
+        $this->assertNotNull($row['user_id']);
     }
 
     private function assertEventData($row) {

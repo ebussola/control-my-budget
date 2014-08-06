@@ -80,15 +80,19 @@ interface DataProvider
     /**
      * @param int $month
      * @param int $year
+     * @param int $user_id
      *
      * @return MonthlyGoal[]
      */
-    public function findMonthlyGoalsByMonthAndYear($month, $year);
+    public function findMonthlyGoalsByMonthAndYear($month, $year, $user_id);
 
     /**
+     * @param int $user_id
+     * @param int $page
+     * @param null | int $page_size
      * @return array
      */
-    public function findAllMonthlyGoals($page = 1, $page_size = null);
+    public function findAllMonthlyGoals($user_id, $page = 1, $page_size = null);
 
     /**
      * @param \DateTime $date_start

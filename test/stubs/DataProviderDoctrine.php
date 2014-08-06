@@ -145,18 +145,20 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider
      *
      * @return \shina\controlmybudget\MonthlyGoal[]
      */
-    public function findMonthlyGoalsByMonthAndYear($month, $year)
+    public function findMonthlyGoalsByMonthAndYear($month, $year, $user_id)
     {
         $query = $this->conn->createQueryBuilder()
             ->select('*')
             ->from('monthly_goal', 'mg')
             ->where('mg.month = ?')
-            ->andWhere('mg.year = ?');
+            ->andWhere('mg.year = ?')
+            ->andWhere('mg.user_id = ?');
         $data = $this->conn->executeQuery(
             $query,
             array(
                 $month,
-                $year
+                $year,
+                $user_id
             )
         )->fetchAll();
 
@@ -242,6 +244,7 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider
         $table2->addColumn('month', 'integer');
         $table2->addColumn('year', 'integer');
         $table2->addColumn('amount_goal', 'float');
+        $table2->addColumn('user_id', 'integer');
 
         $table3 = $schema->createTable('event');
         $table3->addColumn('id', 'integer');
@@ -295,18 +298,19 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider
     /**
      * @return \shina\controlmybudget\MonthlyGoal[]
      */
-    public function findAllMonthlyGoals($page = 1, $page_size = null)
+    public function findAllMonthlyGoals($user_id, $page = 1, $page_size = null)
     {
         $query = $this->conn->createQueryBuilder();
         $query->select('*')
-            ->from('monthly_goal', 'mg');
+            ->from('monthly_goal', 'mg')
+            ->where('mg.user_id = :user_id');
 
         if ($page_size !== null) {
             $query->setMaxResults($page_size)
                 ->setFirstResult(($page - 1) * $page_size);
         }
 
-        $data = $this->conn->executeQuery($query)->fetchAll();
+        $data = $this->conn->executeQuery($query, ['user_id' => $user_id])->fetchAll();
 
         foreach ($data as &$monthly_goal_data) {
             $events_data = $this->conn->executeQuery(
