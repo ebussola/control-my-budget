@@ -24,7 +24,7 @@ class PurchaseService
      */
     private $current_date;
 
-    public function __construct(DataProvider $data_provider, Date $current_date=null)
+    public function __construct(DataProvider $data_provider, Date $current_date = null)
     {
         if ($current_date === null) {
             $current_date = new Date('today');
@@ -42,8 +42,7 @@ class PurchaseService
     {
         $data = $this->toArray($purchase, $user);
 
-        // @todo refactor hash implementation and re-hash all purchases on DB
-        $hash = md5(join('.', $data));
+        $hash = $this->hash($data);
         if (!$this->data_provider->findPurchaseByHash($hash)) {
 
             if ($purchase->date > $this->current_date) {
@@ -157,6 +156,17 @@ class PurchaseService
         $purchase->amount = (float)$row['amount'];
 
         return $purchase;
+    }
+
+    /**
+     * @param $data
+     * @return string
+     */
+    protected function hash($data)
+    {
+        return md5(
+            join('.', [$data['date'], $data['place'], $data['amount']])
+        );
     }
 
 }
