@@ -72,13 +72,14 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider
      *
      * @return array
      */
-    public function findPurchasesByPeriod(\DateTime $date_start, \DateTime $date_end)
+    public function findPurchasesByPeriod(\DateTime $date_start, \DateTime $date_end, $user_id)
     {
         $data = $this->conn->executeQuery(
-            'SELECT * FROM purchase WHERE date >= ? AND date <= ?',
+            'SELECT * FROM purchase WHERE date >= ? AND date <= ? AND user_id = ?',
             array(
                 $date_start->format('Y-m-d'),
-                $date_end->format('Y-m-d')
+                $date_end->format('Y-m-d'),
+                $user_id
             )
         )->fetchAll();
 
@@ -174,15 +175,9 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider
         return $data;
     }
 
-    /**
-     * @param \DateTime $date_start
-     * @param \DateTime $date_end
-     *
-     * @return float
-     */
-    public function calcAmountByPeriod(\DateTime $date_start, \DateTime $date_end, $only_forecast = false)
+    public function calcAmountByPeriod(\DateTime $date_start, \DateTime $date_end, $user_id, $only_forecast = false)
     {
-        $data = $this->findPurchasesByPeriod($date_start, $date_end);
+        $data = $this->findPurchasesByPeriod($date_start, $date_end, $user_id);
         $amount = 0;
         foreach ($data as $row) {
             if ($only_forecast && !$row['is_forecast']) {
@@ -238,6 +233,7 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider
         $table1->addColumn('amount', 'float');
         $table1->addColumn('hash', 'string');
         $table1->addColumn('is_forecast', 'boolean');
+        $table1->addColumn('user_id', 'integer');
 
         $table2 = $schema->createTable('monthly_goal');
         $table2->addColumn('id', 'integer');

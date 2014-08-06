@@ -26,6 +26,11 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
      */
     private $data_provider;
 
+    /**
+     * @var \shina\controlmybudget\User
+     */
+    protected $user;
+
     public function setUp() {
         $goalr = new Goalr();
         $conn = \Doctrine\DBAL\DriverManager::getConnection(array(
@@ -38,6 +43,9 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
         $purchase_service = new \shina\controlmybudget\PurchaseService($this->data_provider);
         $this->purchase_service = new \shina\controlmybudget\PurchaseService($this->data_provider);
         $this->budget_control_service = new \shina\controlmybudget\BudgetControlService($purchase_service, $goalr);
+
+        $this->user = new \shina\controlmybudget\User();
+        $this->user->id = 1;
     }
 
     public function testGetDailyBudget() {
@@ -45,25 +53,25 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
         $purchase->date = new DateTime('2014-01-15');
         $purchase->place = 'Zona Sul';
         $purchase->amount = 2.1;
-        $this->purchase_service->save($purchase);
+        $this->purchase_service->save($purchase, $this->user);
 
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
         $purchase->date = new DateTime('2013-12-25');
         $purchase->place = 'Natalandia';
         $purchase->amount = 300;
-        $this->purchase_service->save($purchase);
+        $this->purchase_service->save($purchase, $this->user);
 
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
         $purchase->date = new DateTime('2014-01-20');
         $purchase->place = 'Casa do carnaval';
         $purchase->amount = 54.70;
-        $this->purchase_service->save($purchase);
+        $this->purchase_service->save($purchase, $this->user);
 
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
         $purchase->date = new DateTime('2014-01-21');
         $purchase->place = 'Bigbi';
         $purchase->amount = 11.00;
-        $this->purchase_service->save($purchase);
+        $this->purchase_service->save($purchase, $this->user);
 
 
         $events = [];
@@ -91,7 +99,7 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
         $monthly_goal->events = $events;
 
 
-        echo $this->budget_control_service->getDailyBudget($monthly_goal);
+        echo $this->budget_control_service->getDailyBudget($monthly_goal, $this->user);
     }
 
     public function testDecreaseTodaysPurchases()
@@ -100,31 +108,31 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
         $purchase->date = new Date('2014-06-01');
         $purchase->place = 'foo';
         $purchase->amount = 700;
-        $this->purchase_service->save($purchase);
+        $this->purchase_service->save($purchase, $this->user);
 
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
         $purchase->date = new Date('2014-06-15');
         $purchase->place = 'foo';
         $purchase->amount = 50;
-        $this->purchase_service->save($purchase);
+        $this->purchase_service->save($purchase, $this->user);
 
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
         $purchase->date = new Date('2014-06-16');
         $purchase->place = 'foo';
         $purchase->amount = 25;
-        $this->purchase_service->save($purchase);
+        $this->purchase_service->save($purchase, $this->user);
 
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
         $purchase->date = new Date('2014-06-16');
         $purchase->place = 'foobar';
         $purchase->amount = 25;
-        $this->purchase_service->save($purchase);
+        $this->purchase_service->save($purchase, $this->user);
 
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
         $purchase->date = new Date('2014-06-17');
         $purchase->place = 'bar';
         $purchase->amount = 30;
-        $this->purchase_service->save($purchase);
+        $this->purchase_service->save($purchase, $this->user);
 
         $monthly_goal = new \shina\controlmybudget\MonthlyGoal\MonthlyGoal();
         $monthly_goal->month = 6;
@@ -135,7 +143,7 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
         $goalr = new Goalr(new Date('2014-06-17'));
         $budget_control_service = new \shina\controlmybudget\BudgetControlService($this->purchase_service, $goalr);
 
-        $this->assertEquals(20, $budget_control_service->getDailyBudget($monthly_goal));
+        $this->assertEquals(20, $budget_control_service->getDailyBudget($monthly_goal, $this->user));
     }
 
     public function testDontDecreaseTodays_ButForecast_Purchases()
@@ -146,7 +154,7 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
         $purchase->date = new Date('2014-08-02');
         $purchase->place = 'foo';
         $purchase->amount = 10;
-        $purchase_service->save($purchase);
+        $purchase_service->save($purchase, $this->user);
 
         $monthly_goal = new \shina\controlmybudget\MonthlyGoal\MonthlyGoal();
         $monthly_goal->month = 8;
@@ -157,7 +165,7 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
         $goalr = new Goalr(new Date('2014-08-02'));
         $budget_control_service = new \shina\controlmybudget\BudgetControlService($this->purchase_service, $goalr);
 
-        $this->assertEquals(50, $budget_control_service->getDailyBudget($monthly_goal));
+        $this->assertEquals(50, $budget_control_service->getDailyBudget($monthly_goal, $this->user));
     }
 
     public function testSpentSimulation()
@@ -166,31 +174,31 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
         $purchase->date = new Date('2014-06-01');
         $purchase->place = 'foo';
         $purchase->amount = 700;
-        $this->purchase_service->save($purchase);
+        $this->purchase_service->save($purchase, $this->user);
 
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
         $purchase->date = new Date('2014-06-15');
         $purchase->place = 'foo';
         $purchase->amount = 50;
-        $this->purchase_service->save($purchase);
+        $this->purchase_service->save($purchase, $this->user);
 
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
         $purchase->date = new Date('2014-06-16');
         $purchase->place = 'foo';
         $purchase->amount = 25;
-        $this->purchase_service->save($purchase);
+        $this->purchase_service->save($purchase, $this->user);
 
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
         $purchase->date = new Date('2014-06-16');
         $purchase->place = 'foobar';
         $purchase->amount = 25;
-        $this->purchase_service->save($purchase);
+        $this->purchase_service->save($purchase, $this->user);
 
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
         $purchase->date = new Date('2014-06-17');
         $purchase->place = 'bar';
         $purchase->amount = 30;
-        $this->purchase_service->save($purchase);
+        $this->purchase_service->save($purchase, $this->user);
 
         $monthly_goal = new \shina\controlmybudget\MonthlyGoal\MonthlyGoal();
         $monthly_goal->month = 6;
@@ -201,7 +209,7 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
         $goalr = new Goalr(new Date('2014-06-17'));
         $budget_control_service = new \shina\controlmybudget\BudgetControlService($this->purchase_service, $goalr);
 
-        $this->assertEquals(2, $budget_control_service->getDailyBudget($monthly_goal, 252));
+        $this->assertEquals(2, $budget_control_service->getDailyBudget($monthly_goal, $this->user, 252));
     }
 
     public function testForecastPurchase()
@@ -210,13 +218,13 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
         $purchase->date = new Date('2014-08-10');
         $purchase->place = 'foo';
         $purchase->amount = 500;
-        $this->purchase_service->save($purchase);
+        $this->purchase_service->save($purchase, $this->user);
 
         $purchase = new \shina\controlmybudget\Purchase\Purchase();
         $purchase->date = new Date('2014-08-15');
         $purchase->place = 'bar';
         $purchase->amount = 70;
-        $this->purchase_service->save($purchase);
+        $this->purchase_service->save($purchase, $this->user);
 
         $monthly_goal = new \shina\controlmybudget\MonthlyGoal\MonthlyGoal();
         $monthly_goal->month = 8;
@@ -227,7 +235,7 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
         $goalr = new Goalr(new Date('2014-08-01'));
         $budget_control_service = new \shina\controlmybudget\BudgetControlService($this->purchase_service, $goalr);
 
-        $this->assertEquals(30, $budget_control_service->getDailyBudget($monthly_goal));
+        $this->assertEquals(30, $budget_control_service->getDailyBudget($monthly_goal, $this->user));
     }
 
 }

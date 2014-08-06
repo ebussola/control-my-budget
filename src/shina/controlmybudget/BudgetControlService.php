@@ -32,12 +32,13 @@ class BudgetControlService
 
     /**
      * @param MonthlyGoal $monthly_goal
+     * @param User $user
      * @param float|null $manual_spent
      * Use $manual_spent to add a simulation spent to preview a daily budget with this spent.
      *
      * @return float
      */
-    public function getDailyBudget(MonthlyGoal $monthly_goal, $manual_spent = null)
+    public function getDailyBudget(MonthlyGoal $monthly_goal, User $user, $manual_spent = null)
     {
         $date_start = new \DateTime();
         $date_start->setDate($monthly_goal->year, $monthly_goal->month, 1);
@@ -56,11 +57,12 @@ class BudgetControlService
         $tomorrow->modify('+1 day');
         $forecast_amount_today = $this->purchase_service->getForecastAmountByPeriod(
             $this->goalr->current_date,
-            $this->goalr->current_date
+            $this->goalr->current_date,
+            $user
         );
 
-        $spent = $this->purchase_service->getAmountByPeriod($date_start, $yesterday)
-            + $this->purchase_service->getAmountByPeriod($tomorrow, $date_end)
+        $spent = $this->purchase_service->getAmountByPeriod($date_start, $yesterday, $user)
+            + $this->purchase_service->getAmountByPeriod($tomorrow, $date_end, $user)
             + $forecast_amount_today;
 
         if ($manual_spent !== null) {
@@ -68,7 +70,8 @@ class BudgetControlService
         }
         $spent_today = $this->purchase_service->getAmountByPeriod(
                 $this->goalr->current_date,
-                $this->goalr->current_date
+                $this->goalr->current_date,
+                $user
             ) - $forecast_amount_today;
         $daily_budget = $this->goalr->getDailyBudget($goal, $spent, $monthly_goal->events);
 

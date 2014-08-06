@@ -37,10 +37,11 @@ interface DataProvider
     /**
      * @param \DateTime $date_start
      * @param \DateTime $date_end
+     * @param integer $user_id
      *
      * @return array
      */
-    public function findPurchasesByPeriod(\DateTime $date_start, \DateTime $date_end);
+    public function findPurchasesByPeriod(\DateTime $date_start, \DateTime $date_end, $user_id);
 
     /**
      * @param string $hash
@@ -97,11 +98,11 @@ interface DataProvider
     /**
      * @param \DateTime $date_start
      * @param \DateTime $date_end
-     * @param boolean   $only_forecast
-     *
+     * @param integer $user_id
+     * @param bool $only_forecast
      * @return float
      */
-    public function calcAmountByPeriod(\DateTime $date_start, \DateTime $date_end, $only_forecast=false);
+    public function calcAmountByPeriod(\DateTime $date_start, \DateTime $date_end, $user_id, $only_forecast = false);
 
     /**
      * @param int[] $monthly_goal_ids
@@ -133,7 +134,7 @@ interface DataProvider
      * @param int | null $page_size
      * @return array
      */
-    public function findAllUsers($page=1, $page_size=null);
+    public function findAllUsers($page = 1, $page_size = null);
 
     /**
      * @param array $data

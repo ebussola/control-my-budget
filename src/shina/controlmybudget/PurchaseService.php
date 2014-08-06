@@ -36,11 +36,13 @@ class PurchaseService
 
     /**
      * @param Purchase $purchase
+     * @param User $user
      */
-    public function save(Purchase $purchase)
+    public function save(Purchase $purchase, User $user)
     {
-        $data = $this->toArray($purchase);
+        $data = $this->toArray($purchase, $user);
 
+        // @todo refactor hash implementation and re-hash all purchases on DB
         $hash = md5(join('.', $data));
         if (!$this->data_provider->findPurchaseByHash($hash)) {
 
@@ -78,12 +80,13 @@ class PurchaseService
     /**
      * @param \DateTime $date_start
      * @param \DateTime $date_end
+     * @param User $user
      *
      * @return Purchase[]
      */
-    public function getPurchasesByPeriod(\DateTime $date_start, \DateTime $date_end)
+    public function getPurchasesByPeriod(\DateTime $date_start, \DateTime $date_end, User $user)
     {
-        $data = $this->data_provider->findPurchasesByPeriod($date_start, $date_end);
+        $data = $this->data_provider->findPurchasesByPeriod($date_start, $date_end, $user->id);
 
         $purchases = array();
         foreach ($data as $row) {
@@ -96,21 +99,23 @@ class PurchaseService
     /**
      * @param \DateTime $date_start
      * @param \DateTime $date_end
+     * @param User $user
      * @return float
      */
-    public function getAmountByPeriod(\DateTime $date_start, \DateTime $date_end)
+    public function getAmountByPeriod(\DateTime $date_start, \DateTime $date_end, User $user)
     {
-        return (float)$this->data_provider->calcAmountByPeriod($date_start, $date_end);
+        return (float)$this->data_provider->calcAmountByPeriod($date_start, $date_end, $user->id);
     }
 
     /**
      * @param \DateTime $date_start
      * @param \DateTime $date_end
+     * @param User $user
      * @return float
      */
-    public function getForecastAmountByPeriod(\DateTime $date_start, \DateTime $date_end)
+    public function getForecastAmountByPeriod(\DateTime $date_start, \DateTime $date_end, User $user)
     {
-        return (float)$this->data_provider->calcAmountByPeriod($date_start, $date_end, true);
+        return (float)$this->data_provider->calcAmountByPeriod($date_start, $date_end, $user->id, true);
     }
 
     /**
@@ -127,13 +132,14 @@ class PurchaseService
      *
      * @return array
      */
-    private function toArray(Purchase $purchase)
+    private function toArray(Purchase $purchase, User $user)
     {
         return array(
             'id' => $purchase->id,
             'date' => $purchase->date->format('Y-m-d'),
             'place' => $purchase->place,
-            'amount' => $purchase->amount
+            'amount' => $purchase->amount,
+            'user_id' => $user->id
         );
     }
 
