@@ -42,7 +42,7 @@ class PurchaseService
     {
         $data = $this->toArray($purchase, $user);
 
-        $hash = $this->hash($data);
+        $hash = $this->hash($data, $user);
         if (!$this->data_provider->findPurchaseByHash($hash)) {
 
             if ($purchase->date > $this->current_date) {
@@ -160,12 +160,13 @@ class PurchaseService
 
     /**
      * @param $data
+     * @param User $user
      * @return string
      */
-    protected function hash($data)
+    protected function hash($data, User $user)
     {
         return md5(
-            join('.', [$data['date'], $data['place'], $data['amount']])
+            join('.', [$data['date'], $data['place'], $data['amount'], $user->id])
         );
     }
 
