@@ -14,9 +14,24 @@ use ebussola\common\datatype\number\Currency;
 use Fetch\Message;
 use shina\controlmybudget\Importer;
 use shina\controlmybudget\Purchase;
+use shina\controlmybudget\PurchaseService;
+use shina\controlmybudget\User;
 
 class MailItauPaymentImport extends MailImportAbstract implements Importer
 {
+
+    protected $from;
+
+    public function __construct(\Fetch\Server $imap, PurchaseService $purchase_service, $from = null)
+    {
+        if ($from === null) {
+            $from = 'comunicacaodigital@itau-unibanco.com.br';
+        }
+
+        $this->from = $from;
+
+        parent::__construct($imap, $purchase_service);
+    }
 
     /**
      * @param Message $message
@@ -44,9 +59,9 @@ class MailItauPaymentImport extends MailImportAbstract implements Importer
     /**
      * @return string
      */
-    protected function getImapSearch()
+    protected function getImapSearch(User $user)
     {
-        return 'FROM "comunicacaodigital@itau-unibanco.com.br" SUBJECT "Pagamento realizado"';
+        return 'FROM "' . $this->from . '" TO "'.$user->email.'" SUBJECT "Pagamento realizado"';
     }
 
 }

@@ -12,9 +12,27 @@ namespace shina\controlmybudget\ImportHandler;
 use Fetch\Message;
 use shina\controlmybudget\Importer;
 use shina\controlmybudget\Purchase;
+use shina\controlmybudget\PurchaseService;
+use shina\controlmybudget\User;
 
 class MailItauCardImport extends MailImportAbstract implements Importer
 {
+
+    /**
+     * @var string
+     */
+    protected $from;
+
+    public function __construct(\Fetch\Server $imap, PurchaseService $purchase_service, $from = null)
+    {
+        if ($from === null) {
+            $from = 'itaucard@itau-unibanco.com.br';
+        }
+
+        $this->from = $from;
+
+        parent::__construct($imap, $purchase_service);
+    }
 
     /**
      * @param Message $message
@@ -55,11 +73,12 @@ class MailItauCardImport extends MailImportAbstract implements Importer
     }
 
     /**
+     * @param User $user
      * @return string
      */
-    protected function getImapSearch()
+    protected function getImapSearch(User $user)
     {
-        return 'FROM "itaucard@itau-unibanco.com.br" SUBJECT "realizadas"';
+        return 'FROM "' . $this->from . '" TO "'.$user->email.'" SUBJECT "realizadas"';
     }
 
 }

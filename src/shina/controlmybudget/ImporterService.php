@@ -33,10 +33,10 @@ class ImporterService
     /**
      * @param int $limit
      */
-    public function import($limit = 3)
+    public function import($limit = 3, User $user)
     {
         foreach ($this->importers as $import) {
-            $import->import($limit);
+            $import->import($limit, $user);
         }
     }
 

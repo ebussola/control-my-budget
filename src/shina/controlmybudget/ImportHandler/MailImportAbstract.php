@@ -12,6 +12,7 @@ namespace shina\controlmybudget\ImportHandler;
 use Fetch\Message;
 use shina\controlmybudget\Purchase;
 use shina\controlmybudget\PurchaseService;
+use shina\controlmybudget\User;
 
 abstract class MailImportAbstract
 {
@@ -34,17 +35,19 @@ abstract class MailImportAbstract
 
     /**
      * @param int|null $limit
+     * @param User $user
      */
-    public function import($limit = 3)
+    public function import($limit = 3, User $user)
     {
         // making the work of Fetch package
-        $messages = imap_sort($this->imap->getImapStream(), SORTARRIVAL, 1, SE_UID, $this->getImapSearch());
+        $messages = imap_sort($this->imap->getImapStream(), SORTARRIVAL, 1, SE_UID, $this->getImapSearch($user));
         if ($limit != null) {
             $messages = array_slice($messages, 0, $limit);
         }
         foreach ($messages as &$message) {
             $message = new Message($message, $this->imap);
         }
+        unset($message);
 
         foreach ($messages as $message) {
             $data = $this->parseData($message);
@@ -52,7 +55,7 @@ abstract class MailImportAbstract
             foreach ($data as $purchase) {
 
                 try {
-                    $this->purchase_service->save($purchase);
+                    $this->purchase_service->save($purchase, $user);
                 } catch (\Exception $e) {
                     continue;
                 }
@@ -62,10 +65,12 @@ abstract class MailImportAbstract
 
     /**
      * Make the first import
+     *
+     * @param User $user
      */
-    public function firstImport()
+    public function firstImport(User $user)
     {
-        $this->import(null);
+        $this->import(null, $user);
     }
 
     /**
@@ -76,8 +81,9 @@ abstract class MailImportAbstract
     abstract protected function parseData(Message $message);
 
     /**
+     * @param User $user
      * @return string
      */
-    abstract protected function getImapSearch();
+    abstract protected function getImapSearch(User $user);
 
 }

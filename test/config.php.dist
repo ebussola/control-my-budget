@@ -1,10 +1,29 @@
 <?php
 
 return array(
+    'email' => '',
     'server_path' => 'imap.gmail.com',
     'port' => 993,
 
     'login' => '',
     'password' => '',
-    'mailbox' => ''
+    'mailbox' => '',
+
+    'sender' => [
+            'email' => '',
+            'server' => '',
+            'port' => '',
+            'security' => 'ssl', // null for nothing
+            'login' => '',
+            'password' => ''
+        ],
+
+        'invalid_sender' => [
+            'email' => '',
+            'server' => '',
+            'port' => '',
+            'security' => 'ssl', // null for nothing
+            'login' => '',
+            'password' => ''
+        ]
 );

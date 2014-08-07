@@ -14,12 +14,15 @@ interface Importer
 
     /**
      * @param int|null $limit
+     * @param User $user
      */
-    public function import($limit = 3);
+    public function import($limit = 3, User $user);
 
     /**
      * Make the first import
+     *
+     * @param User $user
      */
-    public function firstImport();
+    public function firstImport(User $user);
 
 }
