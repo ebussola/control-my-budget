@@ -68,7 +68,7 @@ class UserService
     public function getByAccessToken($access_token)
     {
         $me = $this->http
-            ->get('http://graph.facebook.com/me?access_token='.$access_token)
+            ->get('https://graph.facebook.com/me?access_token='.$access_token)
             ->send()
             ->json();
 
