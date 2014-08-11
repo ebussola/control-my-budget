@@ -255,9 +255,7 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider
         $table4->addColumn('id', 'integer');
         $table4->addColumn('email', 'string');
         $table4->addColumn('name', 'string');
-        $table4->addColumn('facebook_access_token', 'string');
         $table4->addColumn('facebook_user_id', 'string');
-        $table4->addColumn('access_token', 'string', ['notnull' => false]);
 
         $sqls = $schema->toSql($this->conn->getDatabasePlatform());
         foreach ($sqls as $sql) {
@@ -390,12 +388,6 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider
      */
     public function insertUser($data)
     {
-        $facebook_access_token = unserialize($data['facebook_access_token']);
-
-        if (isset($facebook_access_token['access_token'])) {
-            $data['access_token'] = $facebook_access_token['access_token'];
-        }
-
         $data['id'] = $this->id_count;
         $this->conn->insert('user', $data);
         $this->id_count++;
@@ -409,12 +401,6 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider
      */
     public function updateUser($id, $data)
     {
-        $facebook_access_token = unserialize($data['facebook_access_token']);
-
-        if (isset($facebook_access_token['access_token'])) {
-            $data['access_token'] = $facebook_access_token['access_token'];
-        }
-
         $this->conn->update('user', $data, ['id' => $id]);
     }
 
@@ -428,12 +414,12 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider
     }
 
     /**
-     * @param string $access_token
+     * @param string $facebook_user_id
      * @return array
      */
-    public function findUserByAccessToken($access_token)
+    public function findUserByFacebookId($facebook_user_id)
     {
-        return $this->conn->executeQuery('select * from user where access_token=?', [$access_token])
+        return $this->conn->executeQuery('select * from user where facebook_user_id=?', [$facebook_user_id])
             ->fetch();
     }
 

@@ -10,7 +10,8 @@ namespace shina\controlmybudget;
 
 use Guzzle\Http\ClientInterface;
 
-class UserService {
+class UserService
+{
 
     /**
      * @var DataProvider
@@ -66,7 +67,12 @@ class UserService {
      */
     public function getByAccessToken($access_token)
     {
-        $data = $this->data_provider->findUserByAccessToken($access_token);
+        $me = $this->http
+            ->get('http://graph.facebook.com/me?access_token='.$access_token)
+            ->send()
+            ->json();
+
+        $data = $this->data_provider->findUserByFacebookId($me['id']);
         $user = null;
 
         if ($data != null) {
@@ -81,7 +87,7 @@ class UserService {
      * @param null|int $page_size
      * @return User[]
      */
-    public function getAll($page=1, $page_size=null)
+    public function getAll($page = 1, $page_size = null)
     {
         $data = $this->data_provider->findAllUsers($page, $page_size);
         $users = [];
@@ -115,26 +121,26 @@ class UserService {
     {
         return $this->data_provider->deleteUser($user_id) > 0;
     }
-
-    /**
-     * @param User $user
-     * @return bool
-     */
-    public function validateToken(User $user)
-    {
-        $is_time_valid = $user->facebook_access_token['expires'] > time();
-
-        if ($is_time_valid) {
-            $me = $this->http
-                ->get('http://graph.facebook.com/me')
-                ->send()
-                ->json();
-
-            return ($me['id'] == $user->facebook_user_id);
-        }
-
-        return false;
-    }
+//
+//    /**
+//     * @param User $user
+//     * @return bool
+//     */
+//    public function validateToken(User $user)
+//    {
+//        $is_time_valid = $user->facebook_access_token['expires'] > time();
+//
+//        if ($is_time_valid) {
+//            $me = $this->http
+//                ->get('http://graph.facebook.com/me')
+//                ->send()
+//                ->json();
+//
+//            return ($me['id'] == $user->facebook_user_id);
+//        }
+//
+//        return false;
+//    }
 
     /**
      * @param array $data
@@ -147,7 +153,6 @@ class UserService {
         $user->name = $data['name'];
         $user->email = $data['email'];
         $user->facebook_user_id = $data['facebook_user_id'];
-        $user->facebook_access_token = unserialize($data['facebook_access_token']);
 
         return $user;
     }
@@ -162,8 +167,7 @@ class UserService {
             'id' => $user->id,
             'name' => $user->name,
             'email' => $user->email,
-            'facebook_user_id' => $user->facebook_user_id,
-            'facebook_access_token' => serialize($user->facebook_access_token)
+            'facebook_user_id' => $user->facebook_user_id
         ];
     }
 

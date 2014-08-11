@@ -155,9 +155,9 @@ interface DataProvider
     public function deleteUser($user_id);
 
     /**
-     * @param string $access_token
+     * @param string $facebook_user_id
      * @return array
      */
-    public function findUserByAccessToken($access_token);
+    public function findUserByFacebookId($facebook_user_id);
 
 }
