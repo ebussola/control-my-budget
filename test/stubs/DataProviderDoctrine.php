@@ -257,6 +257,23 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider
         $table4->addColumn('name', 'string');
         $table4->addColumn('facebook_user_id', 'string');
 
+        $table5 = $schema->createTable('period_goal');
+        $table5->addColumn('id', 'integer');
+        $table5->addColumn('name', 'string');
+        $table5->addColumn('date_start', 'date');
+        $table5->addColumn('date_end', 'date');
+        $table5->addColumn('amount_goal', 'float');
+        $table5->addColumn('user_id', 'integer');
+
+        $table6 = $schema->createTable('period_event');
+        $table6->addColumn('id', 'integer');
+        $table6->addColumn('name', 'string');
+        $table6->addColumn('date_start', 'date');
+        $table6->addColumn('date_end', 'date');
+        $table6->addColumn('variation', 'float');
+        $table6->addColumn('category', 'string');
+        $table6->addColumn('period_goal_id', 'integer');
+
         $sqls = $schema->toSql($this->conn->getDatabasePlatform());
         foreach ($sqls as $sql) {
             $this->conn->executeQuery($sql);
@@ -276,6 +293,23 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider
                 $this->conn->insert('event', $event_data);
             } else {
                 $this->conn->update('event', $event_data, array('id' => $event_data['id']));
+            }
+        }
+    }
+
+    /**
+     * @param $events
+     * @param $period_goal_id
+     */
+    private function savePeriodEvents($events, $period_goal_id)
+    {
+        foreach ($events as $event_data) {
+            $event_data['period_goal_id'] = $period_goal_id;
+            if ($event_data['id'] == null) {
+                $event_data['id'] = $this->id_count * rand(1, 500);
+                $this->conn->insert('period_event', $event_data);
+            } else {
+                $this->conn->update('period_event', $event_data, array('id' => $event_data['id']));
             }
         }
     }
@@ -423,4 +457,144 @@ class DataProviderDoctrine implements \shina\controlmybudget\DataProvider
             ->fetch();
     }
 
+    /**
+     * @param array $data
+     * @return int
+     */
+    public function insertPeriodGoal($data)
+    {
+        $events = $data['events'];
+        unset($data['events']);
+
+        $data['id'] = $this->id_count;
+        $this->conn->insert('period_goal', $data);
+        $monthly_goal_id = $this->conn->lastInsertId();
+        $this->id_count++;
+
+        $this->savePeriodEvents($events, $monthly_goal_id);
+
+        return $monthly_goal_id;
+    }
+
+    /**
+     * @param int $id
+     * @param array $data
+     */
+    public function updatePeriodGoal($id, $data)
+    {
+        $events = $data['events'];
+        unset($data['events']);
+
+        $this->conn->update('period_goal', $data, array('id' => $data['id']));
+
+        $this->savePeriodEvents($events, $data['id']);
+    }
+
+    /**
+     * @param int[] $ids
+     * @return \shina\controlmybudget\PeriodGoal[]
+     */
+    public function findPeriodGoalByIds($ids)
+    {
+        $query = $this->conn->createQueryBuilder()
+            ->select('*')
+            ->from('period_goal', 'mg')
+            ->where('mg.id IN (?)');
+        $data = $this->conn->executeQuery(
+            $query,
+            array(
+                $ids
+            ),
+            array(
+                \Doctrine\DBAL\Connection::PARAM_INT_ARRAY
+            )
+        )->fetchAll();
+
+        foreach ($data as &$period_goal_data) {
+            $events_data = $this->conn->executeQuery(
+                'SELECT * FROM period_event WHERE period_goal_id = ?',
+                array($period_goal_data['id'])
+            )
+                ->fetchAll();
+            $period_goal_data['events'] = $events_data;
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param \ebussola\common\datatype\datetime\Date $date_start
+     * @param \ebussola\common\datatype\datetime\Date $date_end
+     * @param int $user_id
+     * @return \shina\controlmybudget\PeriodGoal[]
+     */
+    public function findPeriodGoalsByPeriod($date_start, $date_end, $user_id)
+    {
+        $query = $this->conn->createQueryBuilder()
+            ->select('*')
+            ->from('period_goal', 'mg')
+            ->where('mg.date_start <= :date_end')
+            ->andWhere('mg.date_end >= :date_start')
+            ->andWhere('mg.user_id = :user_id');
+        $data = $this->conn->executeQuery(
+            $query,
+            array(
+                'date_start' => $date_start->format('Y-m-d'),
+                'date_end' => $date_end->format('Y-m-d'),
+                'user_id' => $user_id
+            )
+        )->fetchAll();
+
+        foreach ($data as &$period_goal_data) {
+            $events_data = $this->conn->executeQuery(
+                'SELECT * FROM period_event WHERE period_goal_id = ?',
+                array($period_goal_data['id'])
+            )
+                ->fetchAll();
+            $period_goal_data['events'] = $events_data;
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param int $user_id
+     * @param int $page
+     * @param int $page_size
+     * @return \shina\controlmybudget\PeriodGoal[]
+     */
+    public function findAllPeriodGoals($user_id, $page, $page_size)
+    {
+        $query = $this->conn->createQueryBuilder();
+        $query->select('*')
+            ->from('period_goal', 'mg')
+            ->where('mg.user_id = :user_id');
+
+        if ($page_size !== null) {
+            $query->setMaxResults($page_size)
+                ->setFirstResult(($page - 1) * $page_size);
+        }
+
+        $data = $this->conn->executeQuery($query, ['user_id' => $user_id])->fetchAll();
+
+        foreach ($data as &$monthly_goal_data) {
+            $events_data = $this->conn->executeQuery(
+                'SELECT * FROM period_event WHERE period_goal_id = ?',
+                array($monthly_goal_data['id'])
+            )
+                ->fetchAll();
+            $monthly_goal_data['events'] = $events_data;
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param int $period_goal_id
+     * @return int
+     */
+    public function deletePeriodGoal($period_goal_id)
+    {
+        return $this->conn->delete('period_goal', ['id' => $period_goal_id]);
+    }
 }

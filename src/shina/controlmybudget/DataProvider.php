@@ -9,6 +9,8 @@
 namespace shina\controlmybudget;
 
 
+use ebussola\common\datatype\datetime\Date;
+
 interface DataProvider
 {
 
@@ -159,5 +161,45 @@ interface DataProvider
      * @return array
      */
     public function findUserByFacebookId($facebook_user_id);
+
+    /**
+     * @param array $data
+     * @return int
+     */
+    public function insertPeriodGoal($data);
+
+    /**
+     * @param int $period_goal_id
+     * @param array $data
+     */
+    public function updatePeriodGoal($period_goal_id, $data);
+
+    /**
+     * @param int[] $ids
+     * @return PeriodGoal[]
+     */
+    public function findPeriodGoalByIds($ids);
+
+    /**
+     * @param Date $date_start
+     * @param Date $date_end
+     * @param int $user_id
+     * @return PeriodGoal[]
+     */
+    public function findPeriodGoalsByPeriod($date_start, $date_end, $user_id);
+
+    /**
+     * @param int $user_id
+     * @param int $page
+     * @param int $page_size
+     * @return PeriodGoal[]
+     */
+    public function findAllPeriodGoals($user_id, $page, $page_size);
+
+    /**
+     * @param int $period_goal_id
+     * @return int
+     */
+    public function deletePeriodGoal($period_goal_id);
 
 }
