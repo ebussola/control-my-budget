@@ -99,7 +99,7 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
         $monthly_goal->events = $events;
 
 
-        echo $this->budget_control_service->getDailyBudget($monthly_goal, $this->user);
+        echo $this->budget_control_service->getDailyMonthlyBudget($monthly_goal, $this->user) . PHP_EOL;
     }
 
     public function testDecreaseTodaysPurchases()
@@ -143,7 +143,7 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
         $goalr = new Goalr(new Date('2014-06-17'));
         $budget_control_service = new \shina\controlmybudget\BudgetControlService($this->purchase_service, $goalr);
 
-        $this->assertEquals(20, $budget_control_service->getDailyBudget($monthly_goal, $this->user));
+        $this->assertEquals(20, $budget_control_service->getDailyMonthlyBudget($monthly_goal, $this->user));
     }
 
     public function testDontDecreaseTodays_ButForecast_Purchases()
@@ -165,7 +165,7 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
         $goalr = new Goalr(new Date('2014-08-02'));
         $budget_control_service = new \shina\controlmybudget\BudgetControlService($this->purchase_service, $goalr);
 
-        $this->assertEquals(50, $budget_control_service->getDailyBudget($monthly_goal, $this->user));
+        $this->assertEquals(50, $budget_control_service->getDailyMonthlyBudget($monthly_goal, $this->user));
     }
 
     public function testSpentSimulation()
@@ -209,7 +209,7 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
         $goalr = new Goalr(new Date('2014-06-17'));
         $budget_control_service = new \shina\controlmybudget\BudgetControlService($this->purchase_service, $goalr);
 
-        $this->assertEquals(2, $budget_control_service->getDailyBudget($monthly_goal, $this->user, 252));
+        $this->assertEquals(2, $budget_control_service->getDailyMonthlyBudget($monthly_goal, $this->user, 252));
     }
 
     public function testForecastPurchase()
@@ -235,7 +235,61 @@ class BudgetControlServiceTest extends PHPUnit_Framework_TestCase {
         $goalr = new Goalr(new Date('2014-08-01'));
         $budget_control_service = new \shina\controlmybudget\BudgetControlService($this->purchase_service, $goalr);
 
-        $this->assertEquals(30, $budget_control_service->getDailyBudget($monthly_goal, $this->user));
+        $this->assertEquals(30, $budget_control_service->getDailyMonthlyBudget($monthly_goal, $this->user));
+    }
+
+    public function testGetDailyPeriodBudget() {
+        $purchase = new \shina\controlmybudget\Purchase\Purchase();
+        $purchase->date = new DateTime('2014-01-15');
+        $purchase->place = 'Zona Sul';
+        $purchase->amount = 2.1;
+        $this->purchase_service->save($purchase, $this->user);
+
+        $purchase = new \shina\controlmybudget\Purchase\Purchase();
+        $purchase->date = new DateTime('2013-12-25');
+        $purchase->place = 'Natalandia';
+        $purchase->amount = 300;
+        $this->purchase_service->save($purchase, $this->user);
+
+        $purchase = new \shina\controlmybudget\Purchase\Purchase();
+        $purchase->date = new DateTime('2014-01-20');
+        $purchase->place = 'Casa do carnaval';
+        $purchase->amount = 54.70;
+        $this->purchase_service->save($purchase, $this->user);
+
+        $purchase = new \shina\controlmybudget\Purchase\Purchase();
+        $purchase->date = new DateTime('2014-01-21');
+        $purchase->place = 'Bigbi';
+        $purchase->amount = 11.00;
+        $this->purchase_service->save($purchase, $this->user);
+
+
+        $events = [];
+
+        $event = new \ebussola\goalr\event\Event();
+        $event->name = 'fds';
+        $event->date_start = new DateTime('2014-01-01');
+        $event->date_end = new DateTime('2014-01-02');
+        $event->variation = 50;
+        $event->category = 'regular';
+        $events[] = $event;
+
+        $event = new \ebussola\goalr\event\Event();
+        $event->name = 'fds';
+        $event->date_start = new DateTime('2014-01-08');
+        $event->date_end = new DateTime('2014-01-09');
+        $event->variation = 50;
+        $event->category = 'regular';
+        $events[] = $event;
+
+        $period_goal = new \shina\controlmybudget\PeriodGoal();
+        $period_goal->date_start = new Date('2014-01-01');
+        $period_goal->date_end = new Date('2014-01-31');
+        $period_goal->amount_goal = 1500;
+        $period_goal->events = $events;
+
+
+        echo $this->budget_control_service->getDailyPeriodBudget($period_goal, $this->user) . PHP_EOL;
     }
 
 }

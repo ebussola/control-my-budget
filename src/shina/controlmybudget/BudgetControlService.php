@@ -8,6 +8,7 @@
 
 namespace shina\controlmybudget;
 
+use ebussola\goalr\Event;
 use ebussola\goalr\goal\Goal;
 use ebussola\goalr\Goalr;
 
@@ -38,7 +39,7 @@ class BudgetControlService
      *
      * @return float
      */
-    public function getDailyBudget(MonthlyGoal $monthly_goal, User $user, $manual_spent = null)
+    public function getDailyMonthlyBudget(MonthlyGoal $monthly_goal, User $user, $manual_spent = null)
     {
         $date_start = new \DateTime();
         $date_start->setDate($monthly_goal->year, $monthly_goal->month, 1);
@@ -51,6 +52,38 @@ class BudgetControlService
         $goal->date_end = $date_end;
         $goal->total_budget = $monthly_goal->amount_goal;
 
+        return $this->processDailyBudget($monthly_goal->events, $user, $manual_spent, $goal);
+    }
+
+    /**
+     * @param PeriodGoal $period_goal
+     * @param User $user
+     * @param float | null $manual_spent
+     * @return float
+     */
+    public function getDailyPeriodBudget(PeriodGoal $period_goal, User $user, $manual_spent = null)
+    {
+        $goal = new Goal();
+        $goal->date_start = $period_goal->date_start;
+        $goal->date_end = $period_goal->date_end;
+        $goal->total_budget = $period_goal->amount_goal;
+
+        return $this->processDailyBudget($period_goal->events, $user, $manual_spent, $goal);
+    }
+
+    /**
+     * @param Event[] $events
+     * @param User $user
+     * @param $manual_spent
+     * @param $goal
+     * @return float
+     */
+    protected function processDailyBudget(
+        $events,
+        User $user,
+        $manual_spent,
+        $goal
+    ) {
         $yesterday = clone $this->goalr->current_date;
         $yesterday->modify('-1 day');
         $tomorrow = clone $this->goalr->current_date;
@@ -61,8 +94,8 @@ class BudgetControlService
             $user
         );
 
-        $spent = $this->purchase_service->getAmountByPeriod($date_start, $yesterday, $user)
-            + $this->purchase_service->getAmountByPeriod($tomorrow, $date_end, $user)
+        $spent = $this->purchase_service->getAmountByPeriod($goal->date_start, $yesterday, $user)
+            + $this->purchase_service->getAmountByPeriod($tomorrow, $goal->date_end, $user)
             + $forecast_amount_today;
 
         if ($manual_spent !== null) {
@@ -73,7 +106,7 @@ class BudgetControlService
                 $this->goalr->current_date,
                 $user
             ) - $forecast_amount_today;
-        $daily_budget = $this->goalr->getDailyBudget($goal, $spent, $monthly_goal->events);
+        $daily_budget = $this->goalr->getDailyBudget($goal, $spent, $events);
 
         return $daily_budget - $spent_today;
     }
