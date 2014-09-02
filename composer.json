@@ -15,7 +15,7 @@
     "require": {
         "tedivm/fetch": "~0.5",
         "ebussola/goalr": "~1.0",
-        "ebussola/common-datatype": "~2.0",
+        "ebussola/common-datatype": "~2.1",
         "guzzle/guzzle": "~3.9"
     },
     "require-dev": {
