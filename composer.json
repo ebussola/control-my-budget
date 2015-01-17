@@ -13,6 +13,9 @@
     },
 
     "require": {
+        "ext-tidy": "*",
+        "ext-imap": "*",
+
         "tedivm/fetch": "~0.5",
         "ebussola/goalr": "~1.0",
         "ebussola/common-datatype": "~2.1",

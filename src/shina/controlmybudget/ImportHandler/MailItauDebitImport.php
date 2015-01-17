@@ -41,7 +41,7 @@ class MailItauDebitImport extends MailImportAbstract implements Importer
     protected function parseData(Message $message)
     {
         $dom = new \DOMDocument();
-        $dom->loadHTML($message->getMessageBody(true));
+        $dom->loadHTML(tidy_repair_string($message->getMessageBody(true)));
         $nodes = $dom->getElementsByTagName('p');
 
         $purchase = new Purchase\Purchase();
