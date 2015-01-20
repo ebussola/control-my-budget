@@ -124,6 +124,7 @@ abstract class MailImportAbstract extends PHPUnit_Framework_TestCase {
 
         $this->assertNotNull($row['place']);
         $this->assertNotNull($row['amount']);
+        $this->assertTrue(is_numeric($row['amount']) && floor($row['amount']) != $row['amount']); // all amount should be decimal according to generated emails sent by sendMockMails
         $this->assertNotNull($row['user_id']);
         $this->assertEquals($this->user->id, $row['user_id']);
     }
@@ -144,7 +145,7 @@ abstract class MailImportAbstract extends PHPUnit_Framework_TestCase {
 
         // Send some valid emails
         for ($i = 1; $i <= 2; $i++) {
-            $message = $this->makeMessage(new Date('-' . $i . ' days'), md5(rand(0, 1000)), rand(0, 1000));
+            $message = $this->makeMessage(new Date('-' . $i . ' days'), md5(rand(0, 1000)), rand(0, 1000).','.rand(1, 99));
             $message->setFrom($config['sender']['email'])
                 ->setTo($to['email'], $to['name']);
             $this->mailer->send($message);
