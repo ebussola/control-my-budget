@@ -1,5 +1,5 @@
 <?php
-use shina\controlmybudget\ImportHandler\MailItauDebitImport;
+use shina\controlmybudget\ImportHandler\MailItauUniclassDebitImport;
 
 /**
  * Created by PhpStorm.
@@ -14,7 +14,7 @@ class MailItauUniclassDebitImportTest extends MailImportAbstract {
     {
         $config = include 'config.php';
 
-        return new MailItauDebitImport($imap, $purchase_service, $config['sender']['email']);
+        return new MailItauUniclassDebitImport($imap, $purchase_service, $config['sender']['email']);
     }
 
     /**
@@ -31,7 +31,7 @@ class MailItauUniclassDebitImportTest extends MailImportAbstract {
         $body = str_replace('{{amount}}', 'R$ '.$amount, $body);
 
         $message = new Swift_Message(
-            'Compra com cartão débito aprovada',
+            'Compra com cartão de débito aprovada',
             $body,
             'text/html',
             'utf-8'

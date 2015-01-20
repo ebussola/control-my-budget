@@ -17,7 +17,7 @@ use shina\controlmybudget\Purchase;
 use shina\controlmybudget\PurchaseService;
 use shina\controlmybudget\User;
 
-class MailItauDebitImport extends MailImportAbstract implements Importer
+class MailItauUniclassDebitImport extends MailImportAbstract implements Importer
 {
 
     protected $from;
@@ -41,7 +41,7 @@ class MailItauDebitImport extends MailImportAbstract implements Importer
     protected function parseData(Message $message)
     {
         $dom = new \DOMDocument();
-        $dom->loadHTML($message->getMessageBody(true));
+        $dom->loadHTML(tidy_repair_string($message->getMessageBody(true)));
         $nodes = $dom->getElementsByTagName('p');
 
         $purchase = new Purchase\Purchase();
@@ -68,7 +68,7 @@ class MailItauDebitImport extends MailImportAbstract implements Importer
      */
     protected function getImapSearch(User $user)
     {
-        return 'FROM "' . $this->from . '" TO "'.$user->email.'" SUBJECT "Compra com cartão débito aprovada"';
+        return 'FROM "' . $this->from . '" TO "'.$user->email.'" SUBJECT "Compra com cartão de débito aprovada"';
     }
 
 }
