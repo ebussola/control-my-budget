@@ -54,7 +54,7 @@ class MailItauWithdrawImport extends MailImportAbstract implements Importer
         );
         $purchase->date = new Date(join('-', array_reverse(explode('/', $matches[1]))));
 
-        preg_match('/local: (.*?),/', str_replace('.', ',', $nodes->item(2)->nodeValue), $matches);
+        preg_match('/local: (.*?),/', str_replace('.', ',', str_replace("\n", ' ', $nodes->item(2)->nodeValue)), $matches);
         $purchase->place = trim($matches[1]);
 
         preg_match('/R\$ (.*), no dia/', $nodes->item(2)->nodeValue, $matches);
