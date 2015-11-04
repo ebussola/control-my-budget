@@ -38,7 +38,7 @@ class PurchaseService
      * @param Purchase $purchase
      * @param User $user
      */
-    public function save(Purchase $purchase, User $user)
+    public function save(Purchase $purchase, $user)
     {
         $data = $this->toArray($purchase, $user);
 
@@ -83,7 +83,7 @@ class PurchaseService
      *
      * @return Purchase[]
      */
-    public function getPurchasesByPeriod(\DateTime $date_start, \DateTime $date_end, User $user)
+    public function getPurchasesByPeriod(\DateTime $date_start, \DateTime $date_end, $user)
     {
         $data = $this->data_provider->findPurchasesByPeriod($date_start, $date_end, $user->id);
 
@@ -101,7 +101,7 @@ class PurchaseService
      * @param User $user
      * @return float
      */
-    public function getAmountByPeriod(\DateTime $date_start, \DateTime $date_end, User $user)
+    public function getAmountByPeriod(\DateTime $date_start, \DateTime $date_end, $user)
     {
         return (float)$this->data_provider->calcAmountByPeriod($date_start, $date_end, $user->id);
     }
@@ -112,7 +112,7 @@ class PurchaseService
      * @param User $user
      * @return float
      */
-    public function getForecastAmountByPeriod(\DateTime $date_start, \DateTime $date_end, User $user)
+    public function getForecastAmountByPeriod(\DateTime $date_start, \DateTime $date_end, $user)
     {
         return (float)$this->data_provider->calcAmountByPeriod($date_start, $date_end, $user->id, true);
     }
@@ -131,7 +131,7 @@ class PurchaseService
      *
      * @return array
      */
-    private function toArray(Purchase $purchase, User $user)
+    private function toArray(Purchase $purchase, $user)
     {
         return array(
             'id' => $purchase->id,
@@ -163,7 +163,7 @@ class PurchaseService
      * @param User $user
      * @return string
      */
-    protected function hash($data, User $user)
+    protected function hash($data, $user)
     {
         return md5(
             join('.', [$data['date'], $data['place'], $data['amount'], $user->id])

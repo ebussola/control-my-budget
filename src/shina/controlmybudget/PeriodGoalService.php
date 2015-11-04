@@ -29,7 +29,7 @@ class PeriodGoalService
      * @param PeriodGoal $period_goal
      * @param User $user
      */
-    public function save(PeriodGoal $period_goal, User $user)
+    public function save(PeriodGoal $period_goal, $user)
     {
         if ($period_goal->id == null) {
             $id = $this->data_provider->insertPeriodGoal($this->toArray($period_goal, $user));
@@ -63,7 +63,7 @@ class PeriodGoalService
      *
      * @return PeriodGoal[]
      */
-    public function getPeriodGoalByPeriod(Date $date_start, Date $date_end, User $user)
+    public function getPeriodGoalByPeriod(Date $date_start, Date $date_end, $user)
     {
         $data = $this->data_provider->findPeriodGoalsByPeriod($date_start, $date_end, $user->id);
 
@@ -82,7 +82,7 @@ class PeriodGoalService
      *
      * @return PeriodGoal[]
      */
-    public function getAll(User $user, $page = 1, $page_size = null)
+    public function getAll($user, $page = 1, $page_size = null)
     {
         $data = $this->data_provider->findAllPeriodGoals($user->id, $page, $page_size);
 
@@ -103,7 +103,7 @@ class PeriodGoalService
         return $this->data_provider->deletePeriodGoal($period_goal_id);
     }
 
-    private function toArray(PeriodGoal $period_goal, User $user)
+    private function toArray(PeriodGoal $period_goal, $user)
     {
         return array(
             'id' => $period_goal->id,

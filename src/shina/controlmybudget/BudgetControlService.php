@@ -39,7 +39,7 @@ class BudgetControlService
      *
      * @return float
      */
-    public function getDailyMonthlyBudget(MonthlyGoal $monthly_goal, User $user, $manual_spent = null)
+    public function getDailyMonthlyBudget(MonthlyGoal $monthly_goal, $user, $manual_spent = null)
     {
         $date_start = new \DateTime();
         $date_start->setDate($monthly_goal->year, $monthly_goal->month, 1);
@@ -61,7 +61,7 @@ class BudgetControlService
      * @param float | null $manual_spent
      * @return float
      */
-    public function getDailyPeriodBudget(PeriodGoal $period_goal, User $user, $manual_spent = null)
+    public function getDailyPeriodBudget(PeriodGoal $period_goal, $user, $manual_spent = null)
     {
         $goal = new Goal();
         $goal->date_start = $period_goal->date_start;
@@ -80,7 +80,7 @@ class BudgetControlService
      */
     protected function processDailyBudget(
         $events,
-        User $user,
+        $user,
         $manual_spent,
         $goal
     ) {

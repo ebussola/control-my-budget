@@ -28,7 +28,7 @@ class MonthlyGoalService
      * @param MonthlyGoal $monthly_goal
      * @param User $user
      */
-    public function save(MonthlyGoal $monthly_goal, User $user)
+    public function save(MonthlyGoal $monthly_goal, $user)
     {
         if ($monthly_goal->id == null) {
             $id = $this->data_provider->insertMonthlyGoal($this->toArray($monthly_goal, $user));
@@ -62,7 +62,7 @@ class MonthlyGoalService
      *
      * @return MonthlyGoal[]
      */
-    public function getMonthlyGoalByMonthAndYear($month, $year, User $user)
+    public function getMonthlyGoalByMonthAndYear($month, $year, $user)
     {
         $data = $this->data_provider->findMonthlyGoalsByMonthAndYear($month, $year, $user->id);
 
@@ -81,7 +81,7 @@ class MonthlyGoalService
      *
      * @return MonthlyGoal[]
      */
-    public function getAll(User $user, $page = 1, $page_size = null)
+    public function getAll($user, $page = 1, $page_size = null)
     {
         $data = $this->data_provider->findAllMonthlyGoals($user->id, $page, $page_size);
 
@@ -102,7 +102,7 @@ class MonthlyGoalService
         return $this->data_provider->deleteMonthlyGoal($monthly_goal_id);
     }
 
-    private function toArray(MonthlyGoal $monthly_goal, User $user)
+    private function toArray(MonthlyGoal $monthly_goal, $user)
     {
         return array(
             'id' => $monthly_goal->id,

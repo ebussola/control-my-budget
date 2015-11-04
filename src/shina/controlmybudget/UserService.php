@@ -102,7 +102,7 @@ class UserService
      * @param User $user
      * @return int
      */
-    public function save(User $user)
+    public function save($user)
     {
         if ($user->id === null) {
             $user->id = $this->data_provider->insertUser($this->toArray($user));
@@ -161,7 +161,7 @@ class UserService
      * @param User $user
      * @return array
      */
-    private function toArray(User $user)
+    private function toArray($user)
     {
         return [
             'id' => $user->id,
